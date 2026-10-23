@@ -1,0 +1,268 @@
+from openai import OpenAI, APIError
+
+from agent import run_agent
+from app_config import load_config
+from session_store import save_session, load_session
+
+#                       未将工具说明拆成独立模块                                        0.3
+# # 每一轮都向模型提供相同的工具说明。
+# TOOL_SCHEMAS = [
+    # {
+        # "type": "function",
+        # "function": {
+            # "name": "search_notes",
+            # "description": "按关键词查询用户的本地学习笔记。",
+            # "parameters": {
+                # "type": "object",
+                # "properties": {
+                    # "query": {
+                        # "type": "string",
+                        # "description": "简短关键词，例如 epoll，不要传完整问题。",
+                    # }
+                # },
+                # "required": ["query"],
+                # "additionalProperties": False,
+            # },
+        # },
+    # }
+# ]
+# TOOL_SCHEMAS.append({
+    # "type": "function",
+    # "function": {
+        # "name": "read_note",
+        # "description": (
+            # "按搜索结果行号读取原文，每次最多300字符。"
+            # "需要补充被截断的内容时使用；按续读提示继续读取。"
+        # ),
+        # "parameters": {
+            # "type": "object",
+            # "properties": {
+                # "line_number": {
+                    # "type": "integer",
+                    # "minimum": 1,
+                    # "description": "搜索结果中的原始行号，从1开始。",
+                # },
+                # "offset": {
+                    # "type": "integer",
+                    # "minimum": 0,
+                    # "description": "字符偏移，从0开始；首次读取可省略。",
+                # },
+            # },
+            # "required": ["line_number"],
+            # "additionalProperties": False,
+        # },
+    # },
+# })
+#                                                                                             0.3
+
+def main():
+    # 从当前脚本旁边读取配置。
+    config = load_config()
+    # 整个会话共用这一个列表，不能放进下面的 while 循环。
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "你是学习助手。回答本地笔记相关问题前，先查询当前笔记。"
+                "每轮对同一主题只提交一个最具体的查询关键词，"
+                "不要同时查询该关键词及其更宽泛的上位词。"
+                "不同主题可以分别查询。"
+                "工具结果足以回答时，直接给出最终回答；"
+                "只有结果为空或信息不足时，才考虑在下一轮更换关键词。"
+                "仅依据工具结果回答，并使用[文件名:L行号]标注来源。"
+                "资料不足时明确说明，不编造缺失内容。"
+            ),
+        },
+    ]
+    try:
+        history = load_session()
+    except (OSError, ValueError) as exc:
+        print(f"会话恢复失败：{exc}")
+        return  # 停止启动，避免后续保存覆盖损坏的记录。
+
+    if history:
+        # 跳过旧 system，使用当前代码里的系统规则。
+        messages.extend(history[1:])
+        print(f"已恢复 {len(history) - 1} 条历史消息。")
+    # 创建客户端；退出 with 时自动关闭网络连接资源。
+    # 整个会话复用客户端，退出会话后再关闭。
+    with OpenAI(
+        api_key=config["LLM_API_KEY"],
+        base_url=config["LLM_BASE_URL"],
+        timeout=30.0,
+        max_retries=0,  # 首次调试关闭自动重试，便于观察一次请求的结果。
+    ) as client:
+        print("学习助手已启动，输入 exit 或 quit 退出。")
+
+        while True:
+            question = input("\n你：").strip()
+
+            if question.lower() in ("exit", "quit"):
+                print("会话结束。")
+                break
+
+            if not question:
+                print("问题不能为空，请重新输入。")
+                continue
+            # 必须在追加当前问题之前，记录已有历史的长度。
+            history_start = len(messages)
+
+            messages.append({
+                "role": "user",
+                "content": question,
+            })
+
+            try:
+                answer = run_agent(
+                    client,
+                    config["LLM_MODEL_ID"],
+                    messages,
+                    max_steps=5,
+                )
+            except (APIError, OSError, ValueError, TypeError, RuntimeError) as exc:
+                # 删除当前问题及其执行过程中追加的所有消息。
+                # 之前已经完成的问答继续保留。
+                del messages[history_start:]
+
+                print(f"本轮失败（{type(exc).__name__}）：{exc}")
+                print("已撤销本轮对话，可以继续提问。")
+                continue
+
+            print("助手：", answer)
+            
+            # 回答已经完成，保存失败单独报告，不撤销成功的问答。
+            try:
+                saved_path = save_session(messages)
+            except (OSError, TypeError, ValueError) as exc:
+                print(f"回答已完成，但会话保存失败：{exc}")
+            else:
+                print(f"会话已保存：{saved_path.name}")
+            
+    #***把当前问题加入历史，执行一次 Agent，再打印最终回答***                                          0.1
+            # # 每收到一个新问题，只追加这一条用户消息。                       
+            # messages.append({
+                # "role": "user",
+                # "content": question,
+            # })
+
+            # # 每个新问题，重新获得最多 5 次模型调用的额度。
+            # answer = run_agent(
+                # client,
+                # config["LLM_MODEL_ID"],
+                # messages,
+                # max_steps=5,
+            # )
+            # print("助手：", answer)                                                             0.1
+            
+        # ***version 0.6 一次调用模型--模型生成请求调用--调用本地工具--本地工具回填模型给出最终答案***
+        # print("正在请求 DeepSeek……", flush=True)
+
+        # # 这一行才真正发送网络请求。
+        # response = client.chat.completions.create(
+        # model=config["LLM_MODEL_ID"],
+        # messages=messages,
+        # # 工具说明会发给模型，函数实现仍保留在本地。
+        # tools=[
+            # {
+                # "type": "function",
+                # "function": {
+                    # "name": "search_notes",
+                    # "description": "按关键词查询用户的本地学习笔记。",
+                    # "parameters": {
+                        # "type": "object",
+                        # "properties": {
+                            # "query": {
+                                # "type": "string",
+                                # "description": "简短关键词，例如 epoll，不要传完整问题。",
+                            # }
+                        # },
+                        # "required": ["query"],
+                        # "additionalProperties": False,
+                    # },
+                # },
+            # }
+        # ],
+        # tool_choice="auto",
+        # stream=False,
+        # max_tokens=256,
+        # extra_body={"thinking": {"type": "disabled"}},
+    # )
+
+        # choice = response.choices[0]
+        # message = choice.message
+        # print("结束原因：", choice.finish_reason)
+
+       # # 输出被截断时，参数可能不完整，不继续执行工具。
+        # if choice.finish_reason == "length":
+            # raise RuntimeError("模型输出达到长度限制，无法可靠执行工具。")
+
+        # # 工具注册表：把模型使用的名称映射到本地函数。
+        # tool_functions = {
+            # "search_notes": search_notes,
+        # }
+
+        # if message.tool_calls:
+            # # 先记录模型提出的完整工具调用请求，只追加一次。
+            # messages.append(message)
+            # for call in message.tool_calls:
+                # if call.type != "function":
+                    # raise ValueError(f"不支持的工具类型：{call.type}")
+
+                # # 只允许调用注册表中明确提供的工具。
+                # tool_function = tool_functions.get(call.function.name)
+                # if tool_function is None:
+                    # raise ValueError(f"未知工具：{call.function.name}")
+
+                # # arguments 是 JSON 字符串，先解析为 Python 对象。
+                # arguments = json.loads(call.function.arguments)
+
+                # # 参数必须是字典，并且只包含 query。
+                # if not isinstance(arguments, dict) or set(arguments) != {"query"}:
+                    # raise ValueError("工具参数必须是只包含 query 的对象")
+
+                # print("工具名称：", call.function.name)
+                # print("解析后的参数：", arguments)
+
+                # # ** 将字典展开为关键字参数。
+                # # 例如 {"query": "epoll"} → search_notes(query="epoll")
+                # observation = tool_function(**arguments)
+                # print("工具执行结果：", observation)
+                # # 每个工具结果，都对应模型此前提出的一次调用。
+                # messages.append({
+                    # "role": "tool",
+                    # "tool_call_id": call.id,
+                    # "content": observation,
+                # })
+            # print("正在根据工具结果生成回答……", flush=True)
+
+            # # 第二次请求携带完整历史，让模型看到真实执行结果。
+            # final_response = client.chat.completions.create(
+                # model=config["LLM_MODEL_ID"],
+                # messages=messages,
+                # tool_choice="none",  # 本轮直接生成回答。
+                # stream=False,
+                # max_tokens=256,
+                # extra_body={"thinking": {"type": "disabled"}},
+            # )
+
+            # final_choice = final_response.choices[0]
+            # if final_choice.finish_reason != "stop":
+                # raise RuntimeError(
+                    # f"第二轮未正常结束：{final_choice.finish_reason}"
+                # )
+
+            # final_answer = final_choice.message.content
+            # if not final_answer or not final_answer.strip():
+                # raise RuntimeError("第二轮没有返回有效正文")
+
+            # print("最终回答：", final_answer)  
+        # else:
+            # answer = message.content
+            # if not answer or not answer.strip():
+                # raise RuntimeError("响应既没有工具调用，也没有非空正文。")
+            # print("模型直接回答：", answer)
+
+
+# 直接运行此文件时执行；被其他文件导入时不发送请求。
+if __name__ == "__main__":
+    main()
