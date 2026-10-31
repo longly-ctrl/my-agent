@@ -1,9 +1,38 @@
 import json
 
 from openai import OpenAI
-from tools import search_notes, read_note, ToolInputError
+from tools import (
+    search_notes, read_note,
+    search_knowledge, read_knowledge,
+    ToolInputError,
+)
 from tool_schemas import TOOL_SCHEMAS
 
+def build_initial_messages() -> list[dict[str, str]]:
+    """为一个新会话创建初始消息。"""
+    # 每次调用都创建新的列表和字典，避免不同会话共用可变历史。
+    return [
+        {
+            "role": "system",
+            "content": (
+                "你是学习助手。回答本地资料问题前，默认使用"
+                "search_knowledge查询knowledge目录。"
+                "查询使用简短关键词，多个词用空格分隔。"
+                "预览足以回答时直接回答；不足时调用read_knowledge，"
+                "原样使用搜索返回的doc_id及起止行号。"
+                "续读使用next_offset；为null时停止。"
+                "仅依据工具资料回答，使用"
+                "[文件名:L起始行-L结束行]标注来源。"
+                "最终回答仅包含工具原文支持的事实和必要的资料不足说明。"
+                "可以复述用户问题来说明缺口，但不得补充问题及工具原文之外的"
+                "专业术语、具体分级、机制或示例；"
+                "即使以“例如”或“资料没有介绍”的形式列举，也不例外。"
+                "只有用户明确要求根目录notes.md时，"
+                "才使用search_notes和read_note。"
+            ),
+        },
+    ]
+    
 def build_context(messages: list, keep_turns: int = 3) -> list:
     """前提：第一条消息是 system；每条 user 消息开始一轮。"""
     if keep_turns < 1:
@@ -34,6 +63,7 @@ def run_agent(
     model: str,
     messages: list,
     max_steps: int = 5,
+    usage_records: list[dict] | None = None,
 ) -> str:
     """围绕当前消息历史执行 Agent，返回最终回答。"""
     if max_steps < 1:
@@ -46,6 +76,14 @@ def run_agent(
         ),
         "read_note": (
             read_note, {"line_number"}, {"line_number", "offset"},
+        ),
+        "search_knowledge": (
+            search_knowledge, {"query"}, {"query"},
+        ),
+        "read_knowledge": (
+            read_knowledge,
+            {"doc_id", "start_line", "end_line"},
+            {"doc_id", "start_line", "end_line", "offset"},
         ),
     }
 
@@ -64,6 +102,15 @@ def run_agent(
         # 每次请求分别记录实际用量。
         # 测试中的模拟响应可能没有 usage，因此允许缺失。
         usage = getattr(response, "usage", None)
+        if usage_records is not None:
+            # 在检查结束原因之前记录：
+            # 即使响应被截断，本次已返回的用量也应保留。
+            usage_records.append({
+                "step": step,
+                "prompt_tokens": getattr(usage, "prompt_tokens", None),
+                "completion_tokens": getattr(usage, "completion_tokens", None),
+                "total_tokens": getattr(usage, "total_tokens", None),
+            })
         if usage is not None:
             print(
                 f"Token 用量：输入={usage.prompt_tokens}，"

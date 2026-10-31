@@ -1,0 +1,195 @@
+{
+  "baseline_report": "D:\\1AI\\Agent\\eval_reports\\retrieval_eval_20261031T021200_202968Z.json",
+  "dataset": {
+    "schema_version": 1,
+    "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+    "cases": [
+      {
+        "id": "qlora_nf4",
+        "query": "QLoRA 中的 NF4 是什么？",
+        "target_section": [
+          4060,
+          4064
+        ],
+        "evidence_contains": [
+          "NF4（4-bit NormalFloat）"
+        ]
+      },
+      {
+        "id": "low_memory_finetune",
+        "query": "显存不足时，如何用较少资源微调大模型？",
+        "target_section": [
+          4040,
+          4058
+        ],
+        "evidence_contains": [
+          "原始权重从 16bit 压到 4bit，显存直接降到约四分之一"
+        ]
+      },
+      {
+        "id": "rrf_hybrid",
+        "query": "混合检索中，RRF 如何合并两路结果？",
+        "target_section": [
+          678,
+          680
+        ],
+        "evidence_contains": [
+          "同时跑向量检索和BM25关键词检索"
+        ]
+      },
+      {
+        "id": "prefill_decode",
+        "query": "Prefill 和 Decode 分别做什么，影响哪些延迟？",
+        "target_section": [
+          294,
+          303
+        ],
+        "evidence_contains": [
+          "Prefill负责处理全部输入Token并建立KV Cache。",
+          "Decode负责一个接一个生成输出Token。"
+        ]
+      }
+    ]
+  },
+  "index_config": {
+    "schema_version": 1,
+    "model_id": "BAAI/bge-small-zh-v1.5",
+    "model_revision": "7999e1d3359715c523056ef9478215996d62a620",
+    "dimension": 512,
+    "normalize_embeddings": true,
+    "text_format": "heading-path-newline-body-v1",
+    "chunk_params": {
+      "max_chars": 400,
+      "overlap": 50
+    }
+  },
+  "candidate_k": 50,
+  "final_k": 3,
+  "rank_constant": 60,
+  "trials": [
+    {
+      "weights": {
+        "bm25": 0.75,
+        "vector": 0.25
+      },
+      "hits": 3,
+      "total": 4,
+      "hit_at_3": 0.75,
+      "results": [
+        {
+          "id": "qlora_nf4",
+          "first_target_rank": 1,
+          "hit_at_3": true
+        },
+        {
+          "id": "low_memory_finetune",
+          "first_target_rank": 6,
+          "hit_at_3": false
+        },
+        {
+          "id": "rrf_hybrid",
+          "first_target_rank": 1,
+          "hit_at_3": true
+        },
+        {
+          "id": "prefill_decode",
+          "first_target_rank": 3,
+          "hit_at_3": true
+        }
+      ]
+    },
+    {
+      "weights": {
+        "bm25": 0.5,
+        "vector": 0.5
+      },
+      "hits": 3,
+      "total": 4,
+      "hit_at_3": 0.75,
+      "results": [
+        {
+          "id": "qlora_nf4",
+          "first_target_rank": 1,
+          "hit_at_3": true
+        },
+        {
+          "id": "low_memory_finetune",
+          "first_target_rank": 5,
+          "hit_at_3": false
+        },
+        {
+          "id": "rrf_hybrid",
+          "first_target_rank": 1,
+          "hit_at_3": true
+        },
+        {
+          "id": "prefill_decode",
+          "first_target_rank": 3,
+          "hit_at_3": true
+        }
+      ]
+    },
+    {
+      "weights": {
+        "bm25": 0.3,
+        "vector": 0.7
+      },
+      "hits": 4,
+      "total": 4,
+      "hit_at_3": 1.0,
+      "results": [
+        {
+          "id": "qlora_nf4",
+          "first_target_rank": 2,
+          "hit_at_3": true
+        },
+        {
+          "id": "low_memory_finetune",
+          "first_target_rank": 3,
+          "hit_at_3": true
+        },
+        {
+          "id": "rrf_hybrid",
+          "first_target_rank": 1,
+          "hit_at_3": true
+        },
+        {
+          "id": "prefill_decode",
+          "first_target_rank": 3,
+          "hit_at_3": true
+        }
+      ]
+    },
+    {
+      "weights": {
+        "bm25": 0.25,
+        "vector": 0.75
+      },
+      "hits": 3,
+      "total": 4,
+      "hit_at_3": 0.75,
+      "results": [
+        {
+          "id": "qlora_nf4",
+          "first_target_rank": 2,
+          "hit_at_3": true
+        },
+        {
+          "id": "low_memory_finetune",
+          "first_target_rank": 3,
+          "hit_at_3": true
+        },
+        {
+          "id": "rrf_hybrid",
+          "first_target_rank": 1,
+          "hit_at_3": true
+        },
+        {
+          "id": "prefill_decode",
+          "first_target_rank": 4,
+          "hit_at_3": false
+        }
+      ]
+    }
+  ]
+}

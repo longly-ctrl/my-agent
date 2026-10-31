@@ -1,7 +1,21 @@
+import re
 import json
 from pathlib import Path
 
 SESSION_PATH = Path(__file__).resolve().parent / "session.json"
+SESSIONS_DIR = Path(__file__).resolve().parent / "sessions"
+
+
+def get_session_path(session_id: str) -> Path:
+    if not isinstance(session_id, str):
+        raise TypeError("session_id 必须是字符串")
+    if re.fullmatch(r"[a-z0-9_-]{1,64}", session_id) is None:
+        raise ValueError(
+            "session_id 只能包含小写字母、数字、下划线和短横线，长度1到64"
+        )
+
+    # 应用生成文件名，ID 不作为任意路径解释。
+    return SESSIONS_DIR / f"session_{session_id}.json"
 
 
 def save_session(messages: list, path: Path = SESSION_PATH) -> Path:
@@ -33,6 +47,8 @@ def save_session(messages: list, path: Path = SESSION_PATH) -> Path:
         allow_nan=False,     #遇到浮点数NaN、正无穷、负无穷时抛出ValueError，避免生成不符合标准的JSON
     )
 
+    # 首次保存新会话时，自动创建存档目录。
+    path.parent.mkdir(parents=True, exist_ok=True)
     # 先写临时文件，成功后再替换记录，减少半写入的风险。
     temporary = path.with_name(path.name + ".tmp")
     temporary.write_text(text, encoding="utf-8")

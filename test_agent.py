@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 from openai.types.chat import ChatCompletionMessage
 from agent import run_agent
 import json
-from tools import ToolInputError
+from tools import ToolInputError, search_notes, MAX_NOTE_CHARS
 
 
 def make_response(message, finish_reason):
@@ -266,6 +266,19 @@ class AgentTests(unittest.TestCase):
         # 原异常向外传播，并且没有继续请求模型。
         self.assertIs(raised.exception, failure)
         reader.assert_called_once_with(encoding="utf-8-sig")
-        self.assertEqual(client.chat.completions.create.call_count, 1)        
+        self.assertEqual(client.chat.completions.create.call_count, 1)   
+
+    def test_search_rejects_invalid_input(self):
+        cases = [
+            ("wrong_type", None),
+            ("empty", "   "),
+            ("too_long", "x" * (MAX_NOTE_CHARS + 1)),
+        ]
+        for name, query in cases:
+            # 每种输入单独报告，便于定位失败条件。
+            with self.subTest(case=name): #标记当前子测试
+                with self.assertRaises(ToolInputError): #要求代码抛出指定异常
+                    search_notes(query)
+                    
 if __name__ == "__main__":
     unittest.main()

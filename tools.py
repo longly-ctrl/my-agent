@@ -1,4 +1,6 @@
 import re
+import json
+from knowledge_base import load_documents, chunk_documents, search_chunks
 #*** 本地工具查Python字典***
 # # 先用少量内置笔记验证工具机制，后续再接入文件。
 # NOTES = {
@@ -50,13 +52,13 @@ def search_notes(query: str) -> str:
     """按关键词检索本地笔记，返回匹配行及来源位置。"""
 
     if not isinstance(query, str):
-        raise TypeError("query 必须是字符串")
+        raise ToolInputError("query 必须是字符串")
 
     keyword = query.strip()
     if not keyword:
-        raise ValueError("query 不能为空")
+        raise ToolInputError("query 不能为空")
     if len(keyword) > MAX_NOTE_CHARS:
-        raise ValueError("查询关键词不能长于正文展示上限")
+        raise ToolInputError("查询关键词不能长于正文展示上限")
 
     # 每次查询都重新读取文件，因此保存后的修改能在下次查询生效。
     # read_text 会完成文件的打开、读取和关闭。
@@ -154,6 +156,73 @@ def read_note(line_number: int, offset: int = 0) -> str:
         result += "\n【读取提示】已到本行末尾。"
 
     return result
+    
+def search_knowledge(query: str) -> str:
+    # 工具边界继续使用统一的输入异常。
+    if not isinstance(query, str):
+        raise ToolInputError("query 必须是字符串")
+    keyword = query.strip()
+    if not keyword:
+        raise ToolInputError("query 不能为空")
+    if len(keyword) > MAX_NOTE_CHARS:
+        raise ToolInputError("查询关键词不能长于正文展示上限")
+
+    documents = load_documents()
+    chunks = chunk_documents(documents)
+    hits = search_chunks(keyword, chunks, top_k=3)
+
+    matches = []
+    for score, chunk in hits:
+        matches.append({
+            "doc_id": chunk.doc_id,
+            "start_line": chunk.start_line,
+            "end_line": chunk.end_line,
+            "score": score,
+            # 预览长度受限，来源范围描述的是完整片段。
+            "preview": chunk.text[:MAX_NOTE_CHARS],
+            "truncated": len(chunk.text) > MAX_NOTE_CHARS,
+        })
+
+    return json.dumps({"matches": matches}, ensure_ascii=False)
+    
+def read_knowledge(
+    doc_id: str,
+    start_line: int,
+    end_line: int,
+    offset: int = 0,
+) -> str:
+    if not isinstance(doc_id, str) or not doc_id.strip():
+        raise ToolInputError("doc_id 必须是非空字符串")
+    if any(type(value) is not int for value in (start_line, end_line, offset)):
+        raise ToolInputError("行号和 offset 必须是整数")
+    if start_line < 1 or end_line < start_line or offset < 0:
+        raise ToolInputError("行号范围或 offset 不合法")
+
+    # 只接受已加载资料的标识，不把模型输入拼成磁盘路径。
+    documents = load_documents()
+    if doc_id not in documents:
+        raise ToolInputError("未知文档标识，请使用搜索返回的 doc_id")
+
+    lines = documents[doc_id].splitlines()
+    if end_line > len(lines):
+        raise ToolInputError("行号范围超出文档")
+
+    # 行号从1开始，范围包含首尾两行。
+    selected = "\n".join(lines[start_line - 1:end_line])
+    if offset > len(selected):
+        raise ToolInputError("offset 超出所选正文长度")
+
+    end = min(len(selected), offset + MAX_NOTE_CHARS)
+    return json.dumps({
+        "doc_id": doc_id,
+        "start_line": start_line,
+        "end_line": end_line,
+        "offset": offset,
+        "text": selected[offset:end],
+        "next_offset": end if end < len(selected) else None,
+    }, ensure_ascii=False)
+    
+    
 if __name__ == "__main__":
     for query in ("epoll", "Reactor", "Redis"):
         print(f"查询：{query}")

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "split": "holdout",
+  "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+  "frozen_config": {
+    "candidate_k": 50,
+    "final_k": 3,
+    "rank_constant": 60,
+    "weights": {
+      "bm25": 0.3,
+      "vector": 0.7
+    }
+  },
+  "cases": [
+    {
+      "id": "tool_execution_boundary",
+      "query": "模型给出了工具名和参数后，究竟由谁真正执行函数？",
+      "target_section": [396, 397],
+      "evidence_contains": [
+        "大模型本身并不执行，而是告诉应用程序该执行哪段代码"
+      ]
+    },
+    {
+      "id": "kv_cache_growth",
+      "query": "为什么长上下文叠加高并发会让 KV Cache 占用迅速增长？",
+      "target_section": [4615, 4636],
+      "evidence_contains": [
+        "上下文翻倍，单请求缓存接近翻倍；并发翻倍，总缓存也接近翻倍"
+      ]
+    },
+    {
+      "id": "schema_backend_validation",
+      "query": "使用 JSON Schema 约束模型输出后，后端还需要做权限和业务校验吗？",
+      "target_section": [138, 148],
+      "evidence_contains": [
+        "不能保证事实正确、权限合法或业务状态有效"
+      ]
+    },
+    {
+      "id": "chunk_overlap_boundary",
+      "query": "相邻文本块保留重叠内容，主要缓解什么问题？",
+      "target_section": [608, 609],
+      "evidence_contains": [
+        "相邻的chunk之间保留一段重叠的内容"
+      ]
+    }
+  ]
+}

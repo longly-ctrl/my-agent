@@ -1,8 +1,14 @@
 from openai import OpenAI, APIError
 
-from agent import run_agent
+from agent import run_agent, build_initial_messages
 from app_config import load_config
-from session_store import save_session, load_session
+from session_store import (
+    SESSION_PATH,
+    get_session_path,
+    save_session,
+    load_session,
+)
+import argparse
 
 #                       未将工具说明拆成独立模块                                        0.3
 # # 每一轮都向模型提供相同的工具说明。
@@ -55,27 +61,20 @@ from session_store import save_session, load_session
 # })
 #                                                                                             0.3
 
-def main():
+def main(session_id: str | None = None):
+    # 不传ID时兼容原存档；指定ID时使用独立存档。
+    session_file = (
+        SESSION_PATH if session_id is None
+        else get_session_path(session_id)
+    )
+    print(f"当前会话文件：{session_file.name}")
     # 从当前脚本旁边读取配置。
     config = load_config()
     # 整个会话共用这一个列表，不能放进下面的 while 循环。
-    messages = [
-        {
-            "role": "system",
-            "content": (
-                "你是学习助手。回答本地笔记相关问题前，先查询当前笔记。"
-                "每轮对同一主题只提交一个最具体的查询关键词，"
-                "不要同时查询该关键词及其更宽泛的上位词。"
-                "不同主题可以分别查询。"
-                "工具结果足以回答时，直接给出最终回答；"
-                "只有结果为空或信息不足时，才考虑在下一轮更换关键词。"
-                "仅依据工具结果回答，并使用[文件名:L行号]标注来源。"
-                "资料不足时明确说明，不编造缺失内容。"
-            ),
-        },
-    ]
+    # 同一个会话复用这份历史；新会话重新调用函数创建。
+    messages = build_initial_messages()
     try:
-        history = load_session()
+        history = load_session(path=session_file)
     except (OSError, ValueError) as exc:
         print(f"会话恢复失败：{exc}")
         return  # 停止启动，避免后续保存覆盖损坏的记录。
@@ -132,7 +131,7 @@ def main():
             
             # 回答已经完成，保存失败单独报告，不撤销成功的问答。
             try:
-                saved_path = save_session(messages)
+                saved_path = save_session(messages, path=session_file)
             except (OSError, TypeError, ValueError) as exc:
                 print(f"回答已完成，但会话保存失败：{exc}")
             else:
@@ -265,4 +264,13 @@ def main():
 
 # 直接运行此文件时执行；被其他文件导入时不发送请求。
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="本地知识库学习助手"
+    )
+    parser.add_argument(
+        "--session",
+        default=None,
+        help="会话ID；省略时使用原来的session.json",
+    )
+    args = parser.parse_args()
+    main(session_id=args.session)

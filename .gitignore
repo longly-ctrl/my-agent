@@ -14,3 +14,6 @@ session*.json
 
 # 个人学习笔记
 notes.md
+
+# 本地模型下载缓存
+.cache/

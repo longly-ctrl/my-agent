@@ -1,0 +1,2322 @@
+{
+  "query": "显存不足时，如何用较少资源微调大模型？",
+  "index_config": {
+    "schema_version": 1,
+    "model_id": "BAAI/bge-small-zh-v1.5",
+    "model_revision": "7999e1d3359715c523056ef9478215996d62a620",
+    "dimension": 512,
+    "normalize_embeddings": true,
+    "text_format": "heading-path-newline-body-v1",
+    "chunk_params": {
+      "max_chars": 400,
+      "overlap": 50
+    }
+  },
+  "query_instruction": "为这个句子生成表示以用于检索相关文章：",
+  "candidate_k": 50,
+  "rank_constant": 60,
+  "target_section": [
+    4040,
+    4058
+  ],
+  "target_in_top3": {
+    "bm25": false,
+    "vector": true,
+    "hybrid": false
+  },
+  "rankings": {
+    "bm25": [
+      {
+        "chunk_id": "c89fd27c1d641898b0d8699e593db90ff550ad1edc0047ba00ae1e7938f2a75c",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答",
+          "知识拓展",
+          "Q5：应用开发者需要学到多深？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425,
+          4538,
+          4547
+        ],
+        "section_start_paragraph": 4548,
+        "section_end_paragraph": 4601,
+        "start_char": 700,
+        "end_char": 1061,
+        "text": "约定 SLO 的请求数量\n错误率、业务成功率\n服务是否可靠，结果是否真正有用\n④根据现象选择排查层，而不是直接换模型。\n现象\n优先检查\n很久不出第一个字，之后输出正常\n应用前置步骤、排队时间、输入长度和 Prefill\n很快开始，但后面生成很慢\nDecode、资源竞争、活跃并发和内存带宽\n单请求正常，并发一高就超时\n队列、限流、推理容量及超时配置\n加长上下文后 OOM（Out of Memory，内存不足）\nKV Cache、临时计算空间和可用显存\n模型调用很快，整个 Agent 很慢\n工具耗时、串行步骤、重复调用和重试\n返回速度正常，但答案变差\n模型版本、模板、上下文、截断及采样配置\n这些是排查入口，不是仅凭现象就能确定的结论。应通过请求追踪，把应用、检索、工具、排队和模型生成的耗时拆开，再用压测验证修改效果。",
+        "score": 28.026800289066184
+      },
+      {
+        "chunk_id": "4d1b85278701a254eec3a4e442325a0fbb4416c8ba5343c8be4d5bb0eac4c1d9",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "Prefill、Decode和连续批处理怎么把压力放大？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4663
+        ],
+        "section_start_paragraph": 4664,
+        "section_end_paragraph": 4672,
+        "start_char": 350,
+        "end_char": 582,
+        "text": "oken数对应的KV之和\n当空闲KV块不足时，新请求只能排队；部分引擎会抢占已有请求并在之后重算或恢复；管理不当时就直接OOM。于是你会看到一个很典型的现象：GPU计算单元还没有持续跑满，服务却已经因为KV容量不足接不进更多请求。\n这张图回答的是：KV Cache压力如何从单Token经过序列长度和活跃请求数逐层放大。Prefill让长输入一次占入大量缓存，Decode持续追加，连续批处理又让更多请求同时驻留，最终把有限的GPU KV池推到排队、抢占或OOM。",
+        "score": 26.504551420811016
+      },
+      {
+        "chunk_id": "a759ed8ddbc9a8a5895656eaa3b575ddc1975befe3d8eec488caf646edfd72d2",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答",
+          "详细回答",
+          "项目里怎么一步步选部署模式？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425,
+          4432,
+          4498
+        ],
+        "section_start_paragraph": 4499,
+        "section_end_paragraph": 4523,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "不要一上来就问“vLLM还是SGLang”，先过硬门槛。\n第一关看数据、模型许可和权重控制。如果指定数据或权重不能进入第三方边界，云API直接出局；如果必须使用闭源前沿模型，自部署同样可能直接出局。\n第二关看业务是否已经验证。需求、质量标准和调用量都没稳定时，先买API通常比先买GPU更合理。否则很容易用一个月搭好集群，才发现模型根本解决不了业务问题。\n第三关看流量与SLO。持续、可预测的高负载更容易摊薄固定GPU成本；低频和突发流量则可能让GPU长期闲置。实时对话、离线批处理和Agent长任务，对TTFT、TPOT和总完成时间的权重也不同。\n第四关看团队能力。自部署不是把Docker跑起来就结束，还要有人处理驱动、显存不足、模型升级、扩缩容、监控和夜间故障。\n这张图回答的是：部署选型应该按什么顺序做。数据和模型许可先做硬门槛，业务验证与流量再决定是否值得承担固定资源，最后才进入托管或自部",
+        "score": 25.942045748311614
+      },
+      {
+        "chunk_id": "f3983207f4c2f24d75b3fc7f4481148a5367c7c717c4bf020d496d9c66766dae",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "八、面试里怎么讲"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4103
+        ],
+        "section_start_paragraph": 4104,
+        "section_end_paragraph": 4116,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\t“你们微调用的什么方法？LoRA 吗？讲讲为什么用它，参数怎么设的。”\n\t“我们用的是 LoRA，资源紧张的时候用 QLoRA。\n\t用 LoRA 的核心原因是省显存。全参微调要更新所有参数，梯度和优化器状态的开销比模型权重本身还大。LoRA 把原始权重冻结，只在旁路训练两个低秩矩阵，可训练参数能降到原来的几百分之一，梯度和优化器开销跟着一起降。\n\t它的前提假设是，微调要学的权重变化量本质上是低秩的——模型已经会了通用能力，下游适配只需要在少数几个方向上做调整，所以一个低秩矩阵就够表达。\n\t参数上，rank 我一般从 8 或 16 起步，根据任务复杂度和验证集效果往上调；如果要调到很大才有效，说明 LoRA 不太适合这个任务，会重新考虑全参微调。alpha 一般设成 rank 的两倍，它是个缩放因子，除以 r 是为了让 rank 变化时训练更稳定。LoRA 我会加在注意力的 q/k/v/o",
+        "score": 25.83611854513024
+      },
+      {
+        "chunk_id": "053084f3b68fe10f648da5ed570114174353eefcf3a9585d8ff44d593eca065c",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "五、QLoRA：把“便宜”再往死里压一压"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4039
+        ],
+        "section_start_paragraph": 4040,
+        "section_end_paragraph": 4058,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\tLoRA 已经把可训练参数砍到很小了。\n\t但还有一座大山没搬走：\n\t那个被冻结的原始模型，本身还是要完整加载进显存的。\n\t7B 模型光权重就 14GB，70B 模型权重就 140GB。\n\t虽然它冻结了、不参与梯度更新，但你总得把它放进显存里做前向传播吧？\n\tQLoRA 解决的就是这个问题。\n\tQLoRA = Quantization + LoRA，量化 + 低秩适配。\n\t它的核心操作只有一句话：\n\t把那个冻结的基座模型，用 4bit 量化压缩后再加载，而 LoRA 旁路矩阵仍然用较高精度训练。\n\t这张图回答的是：QLoRA 到底量化了哪一部分。\n\t注意看，被压成 4bit 的是冻结的基座（反正它不更新，精度损失一点可以接受）。而真正在学习的 LoRA 适配器保持高精度，保证训练效果不掉。\n\t这一压，效果立竿见影：\n\t·原始权重从 16bit 压到 4bit，显存直接降到约四分之一\n\t·1",
+        "score": 25.561061097377834
+      },
+      {
+        "chunk_id": "82285d4ea3fae7ed69e20ff64fb4eec4ff3d200d832e7b9cd0d213970c6cb946",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答",
+          "知识拓展",
+          "Q5：应用开发者需要学到多深？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425,
+          4538,
+          4547
+        ],
+        "section_start_paragraph": 4548,
+        "section_end_paragraph": 4601,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "不要求每个人都写CUDA内核，但要能讲清责任边界、容量和SLO，知道模型为什么放不下、并发为什么上不去、故障时该看哪一层。否则你只能把所有问题都归因成“模型太慢”。\n① 讲清责任边界：一次请求经过哪些层。\n用户请求\n   ↓\n应用层：Prompt、RAG、Agent 编排、工具调用\n   ↓\n网关层：认证、限流、路由、超时\n   ↓\n推理服务：排队、批处理、KV Cache 管理\n   ↓\n模型计算：Prefill、Decode\n   ↓\n硬件资源：GPU、显存、网络、存储\nAgent 串行调用了五次模型，响应慢可能来自应用编排；请求排队很久，可能是服务容量不足。两者都不能简单归因于模型计算慢。\n② 理解容量：为什么模型放不下，并发上不去。\n推理显存可以粗略拆成：\n所以：\n权重能装下，不代表请求能跑起来：还需要给计算和 KV Cache 留空间。\n单请求能跑，不代表高并发能跑：更多活跃序列",
+        "score": 25.52226538338644
+      },
+      {
+        "chunk_id": "7ee2b785581255628a0da92937e4d928b596d6023afcf25a6b0e5323fb22c9ba",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "Prefill、Decode和连续批处理怎么把压力放大？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4663
+        ],
+        "section_start_paragraph": 4664,
+        "section_end_paragraph": 4672,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "Prefill和Decode消耗显存的方式不一样。\n前文《Token、成本与延迟：大模型应用的三个硬约束》已经拆过TTFT和TPOT，这里把它们继续落到GPU显存上。\n长Prompt进入Prefill后，会快速建立一大段KV Cache，所以长上下文请求可能在刚入场时就申请大量KV块。Decode每轮只追加少量Token，但请求迟迟不结束，缓存会一轮一轮继续增长。\n现代推理引擎通常还会做连续批处理，也叫Iteration-level或In-flight Batching：每轮Decode后，完成的请求退出，新请求立即加入，不必等整个固定Batch全部结束。Orca论文把这种思想称为迭代级调度。\n它提高了GPU利用率，却也让KV池成为调度中心：\n总KV Cache \t≈ \t所有活跃请求已处理Token数对应的KV之和\n当空闲KV块不足时，新请求只能排队；部分引擎会抢占已有请求并在之后重算或恢",
+        "score": 24.902646497527584
+      },
+      {
+        "chunk_id": "bfc194edf9465cda23a56e4c4f14fc746c3b414e1272f83b5a9fddb266179483",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "七、LoRA 不是万能的：什么时候它不够"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4092
+        ],
+        "section_start_paragraph": 4093,
+        "section_end_paragraph": 4102,
+        "start_char": 0,
+        "end_char": 354,
+        "text": "\t讲了这么多好处，也得说清楚边界，不然就成吹了。LoRA 有它的适用范围。\n\t下面这些情况，LoRA 可能不够，要考虑全参微调：\n\t·任务和预训练分布差异极大：比如把一个通用中文模型硬改成一个全新的小语种、或一种全新的领域语言，低秩假设可能不成立\n\t·要给模型注入大量全新知识：注意，这种情况其实更该先想 RAG，但如果确实要训进参数，低秩容量可能不够\n\t·追求极致效果、且资源充足：在数据和算力都管够时，全参微调的效果天花板通常还是比 LoRA 高一点\n\t但话说回来，对绝大多数应用开发者来说：\n\t90% 的微调需求，LoRA 或 QLoRA 都能很好地满足。\n\t需要上全参微调的场景，反而是少数。\n\t所以别一上来就觉得 LoRA 是“简化版、低配版”。\n\t它在大多数实战场景里，就是那个性价比最高的正解。",
+        "score": 24.538391470119343
+      },
+      {
+        "chunk_id": "0c0c519e83bb6ea9a0fe5c0a1f75859d08a43890ec964beacb2a4c7360be1adb",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912
+        ],
+        "section_start_paragraph": 3913,
+        "section_end_paragraph": 3926,
+        "start_char": 0,
+        "end_char": 385,
+        "text": "这一篇解决“微调具体怎么训”的问题。\n因为不管你是做 SFT，还是做 DPO，真到了动手那一步，几乎都绕不开一个词：LoRA。\n现在你去看任何一个开源微调项目、任何一个垂类模型训练教程，十有八九用的都是 LoRA 或 QLoRA。\n为什么？因为它便宜。便宜到什么程度？\n原来要 8 张 A100 才能训的模型，用 QLoRA 一张消费级显卡就能跑起来。\n这就是它流行的根本原因。但便宜不等于你就懂了。\n面试官最爱在这里挖坑：\n“你用 LoRA 训的？那 rank 设的多少？为什么是这个值？”\n“lora_alpha 是干嘛的？”\n“你 LoRA 加在哪些层上？”\n“QLoRA 和 LoRA 差在哪？量化的是哪部分？”\n这几个问题，能把“只会跑脚本”的人和“真懂原理”的人一秒区分开。\n这篇我们不推公式。\n就把 LoRA 和 QLoRA 讲到你能自己回答上面这些问题。",
+        "score": 24.246909431342765
+      },
+      {
+        "chunk_id": "899b42ca0cc0cbf9d1e0c0e8f31c3d4e9f2b7d8925f24bde7ba79910c629ff45",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "RAG检索增强",
+          "Agentic RAG：RAG为什么一步一步长出了Agent？",
+          "面试如何解释Agentic RAG？"
+        ],
+        "heading_paragraphs": [
+          443,
+          764,
+          873
+        ],
+        "section_start_paragraph": 874,
+        "section_end_paragraph": 876,
+        "start_char": 0,
+        "end_char": 266,
+        "text": "如果问“Agentic RAG和传统RAG有什么区别”，可以这样回答：\n传统RAG的检索路径通常由开发者预先写死，用户问题经过一次或固定次数的检索后直接生成。Agentic RAG把检索封装成Agent工具，由模型根据任务状态决定是否检索、如何拆分Query、选择哪个数据源，并对中间证据做评估；证据不足时可以改写或继续检索，足够时才停止生成带引用的答案。它更适合复杂、多跳和多数据源问题，但会增加延迟、成本、可观测性和权限治理难度。\nAgentic RAG真正增加的不是一层Agent外壳，而是检索过程中的决策权、反馈和停止条件。",
+        "score": 23.546130998024715
+      },
+      {
+        "chunk_id": "4f29217d40ce12cf3dbd63e70993ab55c418ef3f7db6f43d04b5206de549b6d1",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "五、QLoRA：把“便宜”再往死里压一压",
+          "QLoRA 的代价"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4039,
+          4065
+        ],
+        "section_start_paragraph": 4066,
+        "section_end_paragraph": 4070,
+        "start_char": 0,
+        "end_char": 162,
+        "text": "QLoRA 省显存，但也有代价：\n·训练速度通常比 LoRA 慢一些：因为前向传播时要不断把 4bit 权重反量化回计算精度\n·精度上理论上略有损失：虽然 NF4 已经做得很好，但 4bit 终究比 16bit 信息少\n所以选型逻辑很清楚：\n显存够用，优先 LoRA；显存实在不够、卡不够大，再上 QLoRA 用时间换空间。",
+        "score": 23.07218517666714
+      },
+      {
+        "chunk_id": "2cfeb0fae64e12ff97843ca48f68419472c97b68c2a8456465c41da88ffd78c0",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答",
+          "详细回答",
+          "项目里怎么一步步选部署模式？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425,
+          4432,
+          4498
+        ],
+        "section_start_paragraph": 4499,
+        "section_end_paragraph": 4523,
+        "start_char": 350,
+        "end_char": 667,
+        "text": "什么顺序做。数据和模型许可先做硬门槛，业务验证与流量再决定是否值得承担固定资源，最后才进入托管或自部署的工程选择；本地离线是另一条由设备边界触发的分支。\n这个顺序很重要。越靠前的条件越硬，后面的性能优化不能推翻前面的合规和模型可用性。\n自部署长期一定更便宜吗？\n不一定，要比较总拥有成本，也就是TCO。\n云API成本比较显眼，通常能直接看到输入、输出和其他计费项。自部署的成本更分散：\n自部署TCO = GPU与网络资源 + 闲置和冗余容量 + 存储与模型分发\n+ 平台开发和运维人 + 升级、故障与停机成本\n同样不能只比较“单Token成本”。更合理的业务口径是：\n每个成功任务成本 = 周期总成本 / 满足质量与SLO的成功任务数",
+        "score": 22.52621580719399
+      },
+      {
+        "chunk_id": "74b1644faaccdd0afeb75c18d8ecd03aa5f513f252b2afb53887c10202b8b45b",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "RAG检索增强",
+          "向量数据库解决了什么问题：ANN检索原理",
+          "向量索引：ANN如何在速度与精度之间取得平衡"
+        ],
+        "heading_paragraphs": [
+          443,
+          559,
+          582
+        ],
+        "section_start_paragraph": 583,
+        "section_end_paragraph": 587,
+        "start_char": 350,
+        "end_char": 570,
+        "text": "vus、Qdrant、Weaviate等主流向量数据库的默认索引。代价是构建索引时内存占用较大。\nIVF（Inverted File Index，倒排文件索引）：IVF先对所有向量做K-Means聚类，把相似的向量分组到同一个“货架”里。检索时先找到Query向量最近的几个货架，只在这些货架内做精细查找，而不是全量扫描。IVF的优势是内存占用较低，适合超大规模数据集。缺点是如果Query向量刚好落在边界，可能会漏掉相关边界（边界效应）。",
+        "score": 22.202929661530415
+      },
+      {
+        "chunk_id": "178a85e06fc9e5f9c20d7272fc54b94beb51010c7665e8a8063979ed6b64aa77",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "五、QLoRA：把“便宜”再往死里压一压",
+          "QLoRA 的几个关键技术点"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4039,
+          4059
+        ],
+        "section_start_paragraph": 4060,
+        "section_end_paragraph": 4064,
+        "start_char": 0,
+        "end_char": 285,
+        "text": "\t面试如果深问 QLoRA，能甩出这几个词会很加分：\n\t·NF4（4-bit NormalFloat）：一种专门为正态分布权重设计的 4bit 量化数据类型，比普通的 int4 更贴合大模型权重的实际分布，精度损失更小\n\t·双重量化（Double Quantization）：连量化时产生的那些量化常数本身也再量化一次，进一步省一点显存\n\t·Paged Optimizer（分页优化器）：借助显存分页机制，应对训练中偶发的显存峰值，避免 OOM 直接崩掉\n\t但知道“QLoRA 不只是简单粗暴地砍精度，而是用 NF4 这种更聪明的量化方式尽量保住效果”，就够回答面试了。",
+        "score": 22.086284335192357
+      },
+      {
+        "chunk_id": "01ef9d2ce377d97d530705b95759bb5912b8deb8aa5e1cec13a906f064c6e6b6",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "先搞清楚：全参微调到底贵在哪"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3928
+        ],
+        "section_start_paragraph": 3929,
+        "section_end_paragraph": 3943,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "要理解 LoRA 为什么省，得先知道全参微调为什么贵。\n很多人以为微调贵是因为“模型参数多”。\n这只说对了一半。真正吃显存的，不只是模型权重本身。\n我们以一个 7B 模型为例，用最常见的 Adam 优化器，按 FP16 精度算一笔账：\n·模型权重：7B 参数，约 14GB\n·梯度：每个参数都要存一份梯度，又是约 14GB\n·优化器状态：Adam 要为每个参数存动量和方差两份，约 28GB（甚至更多，常用 FP32 存）\n光这三块加起来就奔着 70GB 去了。还没算前向传播的激活值。\n这张图回答的是：全参微调的显存大头不是模型权重，而是梯度和优化器状态。\n你看，权重只占一份，但梯度是一份，Adam 优化器状态是两份。 真正训练时，可训练参数的“伴生开销”比权重本身还大。\n所以核心矛盾很清楚：\n只要你要更新全部参数，梯度和优化器状态就甩不掉，显存就降不下来。\n那有没有办法，只更新一小部分参数，",
+        "score": 22.070711592803136
+      },
+      {
+        "chunk_id": "312ba1ce0897c9b5399873910e295074d50ed72ccf15694ed103c6689f60ebc3",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Function Calling：大模型如何调用工具，为什么是Agent的基础",
+          "面试",
+          "如果模型调用了错误的工具，或者参数提取错了，怎么办？"
+        ],
+        "heading_paragraphs": [
+          395,
+          426,
+          429
+        ],
+        "section_start_paragraph": 430,
+        "section_end_paragraph": 438,
+        "start_char": 350,
+        "end_char": 602,
+        "text": "错误：使用严格的JSON Schema，限制类型、必填字段、枚举和额外字段。\n参数语义错误：由后端检查日期范围、订单状态、资源归属等业务规则。\n反复调用错误：设置最大重试次数、最大调用轮次和无进展检测。\n高风险写操作：增加用户确认、权限校验、幂等键和审计日志。\n长期优化：把失败调用加入评测集，回归测试工具描述、Few-shot示例和模型版本。\n重试不是简单地把请求再发一次，而是把明确、可操作的错误信息回传给模型，让它知道错在哪里以及允许如何修正。Schema只能保证结构，不能替代业务校验和权限控制。",
+        "score": 21.3555546499219
+      },
+      {
+        "chunk_id": "9fceb65ee8653b89965ede09855d95826de917810fc6c281067fece014d91fd6",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Token、成本与延迟：大模型三个硬约束"
+        ],
+        "heading_paragraphs": [
+          266
+        ],
+        "section_start_paragraph": 267,
+        "section_end_paragraph": 272,
+        "start_char": 350,
+        "end_char": 456,
+        "text": "宜和快，而是先守住质量底线，再减少低价值Token，用模型路由、缓存、并发控制和输出上限控制单位请求成本与P95/P99延迟。\nToken是资源计量单位，成本是它乘上价格和调用量，延迟是它在推理链路里消耗的时间。",
+        "score": 20.9526830016664
+      },
+      {
+        "chunk_id": "214bcf741b206f0b893003c5a85206a1f6790c27bd73b122758168359918495b",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Few-shot、CoT与自我反思的区别？",
+          "Few-shot、CoT、自我反思"
+        ],
+        "heading_paragraphs": [
+          77,
+          78
+        ],
+        "section_start_paragraph": 79,
+        "section_end_paragraph": 111,
+        "start_char": 350,
+        "end_char": 750,
+        "text": "测试、Schema或业务系统进行独立验证。\n多跳推理\n指一个问题需要链接多个中间事实才能回答，后续查询或推导依赖前一步结果。真实大模型应用中，它通常通过“问题分解、工具或RAG检索、中间证据记录、继续查询、结果认证、最终综合”完成。工程上需要重点控制错误传播、查询漂移、最大跳数、工具权限、延迟和证据可追溯性。它与CoT不同：CoT是推理方式，多跳推理是问题本身具有多阶段依赖结构。\nFew-shot\nFew-shot和微调有什么区别？\nFew-shot在推理时把示例放入上下文，不修改模型参数；微调使用训练数据更新模型参数，使行为更稳定地保存在模型中。\n什么情况下应该使用Few-shot？\n当任务标签、格式、边界或表达风格难以仅靠规则描述，而且少量高质量示例能够明显提高稳定性时使用。\nFew-shot示例应该如何选择？\n应覆盖代表性正常情况和少量边界情况，避免重复、错误和互相冲突的示例。\nCo",
+        "score": 20.305118758753032
+      },
+      {
+        "chunk_id": "cc81858998115dfbbc84d5a081682a8827e70b06693de9ff9c8764d040254fbf",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Few-shot、CoT与自我反思的区别？",
+          "（模板）如何回答“你做过Prompt优化吗”"
+        ],
+        "heading_paragraphs": [
+          77,
+          112
+        ],
+        "section_start_paragraph": 113,
+        "section_end_paragraph": 115,
+        "start_char": 0,
+        "end_char": 366,
+        "text": "我在个人的 C++ 日志分析项目中做过小规模 Prompt 优化，还没有生产流量。最开始模型会给出很多与日志无关的可能原因。我整理了几十条公开或自己构造的脱敏案例，建立了分类正确性、证据引用和 JSON 格式三个检查项。之后通过明确成功标准、增加两个边界 Few-shot、使用 Schema 校验，以及在证据不足时要求返回未知状态，提高了固定测试集上的稳定性。这个规模不能代表生产效果，但让我完整实践了基线、失败分类、最小修改和回归评测流程。\n如何判断问题出在Prompt，而不是模型能力\n先固定模型和参数，通过失败样本判断模型是否已经拿到足够上下文。如果同一任务通过清晰目标、少量边界示例或明确输出约束可以稳定修复，通常属于Prompt问题；如果不同Prompt下仍持续失败，并且消息和工具充分，才进一步判断是否是模型能力问题。",
+        "score": 20.160596279848793
+      },
+      {
+        "chunk_id": "ff4b95c813d620a5ad8d4b8fb6a3e61a69ea2b618aa04bc70e15669d534aa5bc",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "八、面试里怎么讲"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4103
+        ],
+        "section_start_paragraph": 4104,
+        "section_end_paragraph": 4116,
+        "start_char": 350,
+        "end_char": 685,
+        "text": "缩放因子，除以 r 是为了让 rank 变化时训练更稳定。LoRA 我会加在注意力的 q/k/v/o 和 FFN 的投影层上。\n\t如果显存实在不够，就上 QLoRA，把冻结的基座用 NF4 做 4bit 量化，适配器保持高精度，代价是训练慢一点、精度略有损失。\n\t另外 LoRA 在部署上也有优势，一个基座可以挂多个适配器按业务切换，不用为每个业务存一整个大模型。”\n\t这个回答能体现四件事：\n\t第一，你懂它为什么省（梯度和优化器状态）。\n\t第二，你懂它为什么能省（低秩假设）。\n\t第三，你懂参数背后的权衡（rank、alpha、target_modules）。\n\t第四，你懂工程落地（QLoRA、多适配器部署）。\n\t这比背一句“我们用 LoRA 微调了模型”强太多了。",
+        "score": 20.147486522854244
+      },
+      {
+        "chunk_id": "b4e62f24411a95620f4054b9f1f74c54157f0526680a464f8c84e18600d27dfd",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Function Calling：大模型如何调用工具，为什么是Agent的基础",
+          "为什么Function Calling是Agent的基础？"
+        ],
+        "heading_paragraphs": [
+          395,
+          414
+        ],
+        "section_start_paragraph": 415,
+        "section_end_paragraph": 418,
+        "start_char": 350,
+        "end_char": 546,
+        "text": "lling不准，整个链条就会断裂。\n解决“幻觉”与“时效性”的有效方案：Agent的核心价值是解决实际问题，而实际问题往往涉及私有数据或实时状态。靠微调（Fine-tuning）让模型记住所有库存信息？不可能，数据天天变。靠Prompt把几百万行数据塞进去？上下文有限且昂贵。通过Function Calling，让模型在需要时按需定向查询。让Agent拥有了“无限知识库”和“实时感知力”。",
+        "score": 20.11542750313368
+      },
+      {
+        "chunk_id": "13876b06fdc5137bb3ef6a2755e6aa5d136692a7505250a234927e1942d5b67c",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "五、QLoRA：把“便宜”再往死里压一压"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4039
+        ],
+        "section_start_paragraph": 4040,
+        "section_end_paragraph": 4058,
+        "start_char": 350,
+        "end_char": 541,
+        "text": "\t这一压，效果立竿见影：\n\t·原始权重从 16bit 压到 4bit，显存直接降到约四分之一\n\t·14GB 的 7B 模型，量化后只占 3.5GB 左右\n\t·配合 LoRA 本身极小的可训练参数\n\t最终结果就是：单张 24GB 的消费级显卡，能微调 30B 甚至更大的模型。\n\t这就是为什么 QLoRA 一出来，垂类微调的门槛被砸穿了。\n\t普通人、小团队，也能在自己的卡上训模型了。",
+        "score": 20.071079323440454
+      },
+      {
+        "chunk_id": "32ea6a34fd88da29fbd16a3c62a362b9fb53fa90f361d12e079c711ab3c62e30",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "LoRA 还有一个被低估的好处：部署灵活"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4071
+        ],
+        "section_start_paragraph": 4072,
+        "section_end_paragraph": 4091,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "很多人只看到 LoRA 省训练显存。\n其实它在部署上还有一个杀手锏。\n因为 LoRA 训出来的，只是那两个小矩阵——通常就几十 MB 到几百 MB。\n基座模型一点没变。\n这意味着什么？\n一个基座模型，可以同时挂载多个不同的 LoRA 适配器，按业务需求随时切换。\n\t这张图回答的是：为什么 LoRA 在多业务场景下特别省。\n\t中间是一个共享的基座模型，旁边挂着客服 LoRA、代码 LoRA、文案 LoRA 等好几个小适配器。请求来了，需要哪个能力就挂哪个，基座只加载一份。\n\t对比一下全参微调：\n\t·全参微调每个业务都得存一整个独立的大模型\n\t·LoRA 只需存一个基座 + 多个几百 MB 的小适配器\n\t三个业务，全参微调要存 3 个 7B 模型（约 42GB），LoRA 只要 1 个基座加 3 个小文件（约 14GB 多一点）。\n\t这种“一基座多适配器”的模式，在真实生产环境里非常实用。\n\t",
+        "score": 20.040992837002012
+      },
+      {
+        "chunk_id": "bde30fb85b400a8a44965763418d5a23845e7df7904efa9e874a64413baea3b8",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "二、LoRA 的核心思想：冻结原权重，只学一个“增量”"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3944
+        ],
+        "section_start_paragraph": 3945,
+        "section_end_paragraph": 3969,
+        "start_char": 350,
+        "end_char": 648,
+        "text": " + B×A 合并起来用，效果上等价于一个被微调过的权重。\n这张图回答的是：全参微调和 LoRA 到底改的是哪部分。\n左边全参微调，整个 W 矩阵都是可训练的（红色）。右边 LoRA，原始 W 被冻结（灰色），只有旁路那两个又瘦又小的 A、B 矩阵在训练（绿色）。\n参数量的差距有多大？\n假设 d = 4096，全参微调这一层要更新 4096 × 4096 ≈ 1678 万个参数。\nLoRA 如果取 r = 8，只需要更新 4096×8 + 8×4096 ≈ 6.5 万个参数。\n少了 250 多倍。\n可训练参数少了 250 倍，意味着梯度和优化器状态也跟着少 250 倍。\n显存自然就下来了。",
+        "score": 19.72413596549724
+      },
+      {
+        "chunk_id": "112f016f400632965027d2f2b5ba0071eb876055806852ffec477fb067389d94",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "AI Agent",
+          "Agent学习路线",
+          "\t第四步：工具与协议--Agent的上限由工具决定",
+          "MCP协议：Agent工具调用的新标准",
+          "面试",
+          "“MCP 和 Function Calling 有什么区别？”"
+        ],
+        "heading_paragraphs": [
+          1300,
+          1301,
+          1660,
+          1856,
+          2041,
+          2042
+        ],
+        "section_start_paragraph": 2043,
+        "section_end_paragraph": 2044,
+        "start_char": 0,
+        "end_char": 177,
+        "text": "不能回答“MCP很高级”这很虚。\n你应该说：“Function Calling 是模型侧的工具调用机制，重点是模型输出哪个函数和参数；MCP 是应用侧的工具接入协议，重点是 AI 应用如何发现、连接和调用外部工具、资源和提示模板。实际系统里，Host 可以通过 MCP 获取工具列表，再转成模型支持的 Function Calling 格式让模型调用。”",
+        "score": 19.527336988508985
+      },
+      {
+        "chunk_id": "18e413c66d10a34faf84f8dfd7406f00260d548b63366201661c3b8ddd66c424",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "RAG检索增强",
+          "Embedding是什么：语义压缩与模型选型",
+          "面试："
+        ],
+        "heading_paragraphs": [
+          443,
+          520,
+          556
+        ],
+        "section_start_paragraph": 557,
+        "section_end_paragraph": 558,
+        "start_char": 0,
+        "end_char": 252,
+        "text": "Embedding模型怎么选\nEmbedding模型选型不能只看MTEB总榜。先根据中文、多语言、代码或专业领域，以及是否属于Query-Passage非对称检索来初筛模型；然后检查最大输入长度、Query指令、向量维度、许可证和部署资源。接着使用真实业务数据构造Query、相关Chunk和困难负样本，评估Recall@K，MRR、NDCG，同时测试p95延迟、QPS、显存和索引大小。最后把候选模型接入完整的召回、Rerank和生成链路做到端对端评测，在质量接近时优先选择成本更低、部署更简单的模型。",
+        "score": 19.499561652578638
+      },
+      {
+        "chunk_id": "cadae1d1f976e2227e146c7722eae9d76dc9c74b16cbb9ae13bc7e2ddb3a9e5b",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "RAG检索增强",
+          "RAG系统答不准的常见问题",
+          "生成侧："
+        ],
+        "heading_paragraphs": [
+          443,
+          622,
+          639
+        ],
+        "section_start_paragraph": 640,
+        "section_end_paragraph": 649,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "Prompt拼接有问题：这是工程上很容易被忽视的问题。RAG系统把检索到的chunk拼进Prompt里，但拼接方式不当--比如多个chunk之间没有分隔符、来源信息缺失、指令和内容混在一起、或者指令表述模糊，这些都会让模型难以正确理解输入。\n典例：模型回答时把多个文档的内容混淆了；或者对“如果资料中没有答案请说不知道”这类指令的遵从率很低。\n应对：明确区分“系统指令”和“参考资料”，为不同来源的内容添加分隔符，并在指令里明确告诉模型如何处理资料不足的情况。\n上下文干扰（Context Noise）：召回的chunk里，不是每一条都和用户问题高度相关。低相关度的chunk混入Context，会稀释模型的注意力，让模型在大量无关信息中“迷失”，最终给出的答案受到这些干扰项的影响。这个问题在没有Rerank的系统更为突出，也和top-K设置过大有关。\n典例：答案里混入了一些奇怪的、不相关的细节；",
+        "score": 19.432358148670463
+      },
+      {
+        "chunk_id": "6e4da54ba66f12f0bd13184a3bcd61b89da92e1572d2e93dc79a303fdc91a7cc",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Prompt Engineering:结构化Prompt设计",
+          "Prompt评测和迭代"
+        ],
+        "heading_paragraphs": [
+          13,
+          66
+        ],
+        "section_start_paragraph": 67,
+        "section_end_paragraph": 76,
+        "start_char": 350,
+        "end_char": 640,
+        "text": ">判断失败原因（指令不清楚；缺少上下文；示例不足；工具描述错误；模型能力不足；应交给后端代码处理）->一次只处理一类问题->重新运行完成评测\nPrompt Engineering为什么也需要自动化测试?\n因为Prompt修改可能产生回归,并且模型输出具有概率性.固定评测集能够对比不同Prompt和模型版本的整体表现.\nPrompt效果不好时,应直接添加更多规则吗?\n不应该.应先分析失败的是指令、上下文、工具、模型能力还是后端设计问题。再针对性修改\n如何判断Prompt是否优化成功？\n不能只看一两个例子，应比较任务成功率、事实正确率、格式通过率、安全性、延迟和成本等综合指标。",
+        "score": 19.31257299144179
+      },
+      {
+        "chunk_id": "3d2e7b687ad2935ca542d36633c9c774b1995c1e47e5f254a2684cebfa45e7c4",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Token、成本与延迟：大模型三个硬约束",
+          "面试",
+          "如何回答“你们如何控制大模型成本”？"
+        ],
+        "heading_paragraphs": [
+          266,
+          385,
+          386
+        ],
+        "section_start_paragraph": 387,
+        "section_end_paragraph": 387,
+        "start_char": 0,
+        "end_char": 189,
+        "text": "控制成本不是简单的换便宜模型，而是关注“单位成功任务成本”。首先记录每次请求的输入、缓存输入、输出Token、工具调用次数、重试次数和模型类型；然后通过模型分层路由、上下文预算、限制输出长度、Prompt Cache、减少无效调用和控制Agent循环来降低成本。对于离线任务使用批处理或低优先级模式。同时用固定评测集约束准确率和工具调用成功率，确保成本下降不是以质量下降为代价。",
+        "score": 19.001678487902815
+      },
+      {
+        "chunk_id": "5e8643c5ef98a0309cc34392930915c973e914de055aec13128a6886344436ba",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "AI Agent",
+          "Agent学习路线",
+          "\t第四步：工具与协议--Agent的上限由工具决定",
+          "MCP协议：Agent工具调用的新标准",
+          "MCP 有两层：数据层和传输层"
+        ],
+        "heading_paragraphs": [
+          1300,
+          1301,
+          1660,
+          1856,
+          1910
+        ],
+        "section_start_paragraph": 1911,
+        "section_end_paragraph": 1925,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "1.数据层：定义消息和语义。数据层负责定义：\n·初始化怎么做 ·能力怎么协商 ·工具怎么列出 ·工具怎么调用 \n·资源怎么读取 ·Prompt 怎么获取 ·通知怎么发送 ·错误怎么返回\nMCP 的数据层基于 JSON-RPC。JSON-RPC 是一种使用 JSON 编码消息的 RPC（远程过程调用）协议。它规定：如何请求另一个程序执行方法，以及如何返回结果或错误。\n比如工具发现可以是 tools/list。工具调用可以是 tools/call。\n资源读取可以是 resources/read。Prompt 获取可以是 prompts/get。\n注意，MCP 不是随便用 HTTP 路径写几个接口。\n它有自己的协议方法、请求结构和响应结构。\n2.传输层：定义消息怎么传。传输层负责把这些 JSON-RPC 消息送过去。常见有两种：\n·stdio。本地进程之间通过标准输入输出通信。\n比如 Claud",
+        "score": 18.983173161673825
+      },
+      {
+        "chunk_id": "9bebf1790d70c16ed01513ad9a7e634be06e241c1472ec9727e1dd18eb1ff7bc",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "RAG检索增强",
+          "RAG系统答不准的常见问题",
+          "生成侧："
+        ],
+        "heading_paragraphs": [
+          443,
+          622,
+          639
+        ],
+        "section_start_paragraph": 640,
+        "section_end_paragraph": 649,
+        "start_char": 350,
+        "end_char": 750,
+        "text": "erank的系统更为突出，也和top-K设置过大有关。\n典例：答案里混入了一些奇怪的、不相关的细节；或者模型给出了一个综合了多个不相关来源的“平均答案”。\n应对：用Rerank过滤低相关chunk；减少传入Context的chunk数量（宁少勿滥）；在Prompt里明确要求模型只根据提供的资料作答。\n缺少引用约束（模型自由发挥）：如果Prompt没有明确限制模型“只基于提供的资料作答”，模型会自然地把自身参数里的知识和检索到的内容混合起来回答--这会引入幻觉，让答案看起来比实际更完整，但准确性存疑。\n应对：在系统Prompt里加入明确的引用约束，比如“请严格根据以下资料回答，资料中没有的内容请明确说明无法回答”，并要求模型在答案标注来源。\n模型理解能力不足：即便检索结果质量很高，模型自身的推理能力也会成为瓶颈--尤其是当答案需要跨多个chunk进行综合推断、或者问题本身需要复杂的逻辑推理时",
+        "score": 18.900102456833405
+      },
+      {
+        "chunk_id": "29a8e8f33c2712364efa1c0f7420bbaf77d5977be812b95dbf603b58347e3e52",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型应用怎么稳定上线？网关、限流、监控、灰度与回滚",
+          "详细回答",
+          "监控为什么不能只有GPU利用率和接口错误率？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          5071,
+          5089,
+          5136
+        ],
+        "section_start_paragraph": 5137,
+        "section_end_paragraph": 5152,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "大模型应用的故障经常跨越多层：网关正常返回200，模型也生成了文本，但RAG召回了旧文档，或者工具参数错了，业务仍然失败。\n所以监控要拆成四类证据：\n维度\n重点指标\n流量与容量\nRPS、输入/输出Token、在途请求、队列长度、限流与拒绝率\n延迟与可靠性\nTTFT、TPOT、端到端P95/P99、超时、取消、各层错误码\n资源与成本\nGPU/显存、KV Cache、缓存命中、每请求Token与成功任务成本\n质量与安全\n任务成功率、Schema通过率、检索命中、工具正确率、拒答与安全命中\n指标告诉你“哪里变差了”，日志提供具体上下文，Trace负责回答“时间和错误沿哪条链路传播”。\n每个请求应有统一的Request ID，并在Trace里拆出网关、检索、重排、模型、工具和后处理Span。这样TTFT升高时，才能分清是网关排队、向量库变慢，还是模型Prefill真的变慢。\n日志里不要直接保存完整",
+        "score": 18.53201830743502
+      },
+      {
+        "chunk_id": "b31430def6a3db2cb7e2c9dddd8d663fa2f43bdb61e6069fde96ced39bdec213",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "一条请求的KV Cache到底有多大？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4647
+        ],
+        "section_start_paragraph": 4648,
+        "section_end_paragraph": 4662,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "对常见的标准注意力、MHA或GQA模型，可以先用下面的近似公式建立直觉：\n单请求KV Cache字节数\n≈ 2 × 层数 × Token数 × KV头数 × Head维度 × 每元素字节数\n假设一个模型有32层、8个KV头、Head维度128，KV使用BF16，每个元素2字节：\n每Token KV Cache\n= 2 × 32 × 8 × 128 × 2 Byte\n= 131072 Byte\n≈ 128 KiB\n那么：\n8K Token约占1 GiB；\n32K Token约占4 GiB；\n128K Token约占16 GiB。\n这还只是一条请求。8条32K请求同时驻留，理论KV数据就接近32 GiB。\n真实部署还要给模型权重、CUDA Graph、激活、中间工作区、通信缓冲和运行时预留显存。Tensor Parallel如何切分KV头、模型是否采用MQA、GQA、MLA或滑动窗口，也会改变",
+        "score": 18.411905706285182
+      },
+      {
+        "chunk_id": "6df838b05f455cad322c20a6b0a93bd668782f9dbfff77844d1ff69aba416945",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答",
+          "知识拓展",
+          "Q5：应用开发者需要学到多深？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425,
+          4538,
+          4547
+        ],
+        "section_start_paragraph": 4548,
+        "section_end_paragraph": 4601,
+        "start_char": 350,
+        "end_char": 750,
+        "text": "请求能跑起来：还需要给计算和 KV Cache 留空间。\n单请求能跑，不代表高并发能跑：更多活跃序列通常需要更多 KV Cache。\n长输入、长输出会影响容量：上下文增长会增加缓存需求，长输出还会延长请求占用资源的时间。\n增加并发不一定提高有效吞吐：资源饱和后，可能主要增加排队、延迟和超时。\n③ 定义 SLO：把“快一点”变成可以验收的要求。\n例如，以下只是示意目标：\n在指定流量和输入长度分布下，95% 的请求在 2 秒内开始返回内容，99% 的请求在 15 秒内完成。\n至少要分清：\n指标\n主要观察什么\nTTFT，首 Token 延迟\n从发起请求到开始输出的等待\nTPOT，每输出 Token 时间\n开始输出后的平均生成速度\n端到端延迟\n整个业务任务完成用了多久\nGoodput\n单位时间内满足约定 SLO 的请求数量\n错误率、业务成功率\n服务是否可靠，结果是否真正有用\n④根据现象选择排查层，",
+        "score": 18.251710137120114
+      },
+      {
+        "chunk_id": "b5b36480a1041d8d6d2414cd9b51fdf9ef7f6aa170b2394ac059735b2f3d09bb",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "一条请求的KV Cache到底有多大？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4647
+        ],
+        "section_start_paragraph": 4648,
+        "section_end_paragraph": 4662,
+        "start_char": 350,
+        "end_char": 480,
+        "text": "Tensor Parallel如何切分KV头、模型是否采用MQA、GQA、MLA或滑动窗口，也会改变每张卡的实际占用，所以公式用于容量初算，最终仍要以引擎指标和压测为准。\n真正容易忽略的是：模型权重是相对静态的，KV Cache却是随请求实时增长的动态工作集。",
+        "score": 18.117560019217052
+      },
+      {
+        "chunk_id": "956c2914c320bafa35a530ce7eea61d8f70a8f1567e33fea5fa05295ab0adfc9",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "四、rank 和 alpha：面试最爱挖的两个参数",
+          "rank 怎么理解、怎么设"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3988,
+          3991
+        ],
+        "section_start_paragraph": 3992,
+        "section_end_paragraph": 4001,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "rank 就是上面那个瓶颈的宽度。\nrank 越大，旁路矩阵能表达的变化越丰富，但可训练参数也越多。\n\t·rank 太小（比如 1、2）：表达能力可能不够，复杂任务学不到位\n\t·rank 太大（比如 256）：参数变多，省显存的优势变小，还可能过拟合小数据集（“过拟合小数据集”是指：模型把少量训练样本中的具体内容、偶然规律甚至错误记得太牢，导致训练集表现很好，遇到新输入却表现不好。）\n\t那到底设多少？大多数场景，rank 取 8、16、32 就够了。\n\t·任务简单、数据少：8 起步\n\t·任务复杂、数据多、和预训练分布差异大：可以加到 16、32、64\n\t·上到 128 以上，往往说明这个任务可能本就不适合 LoRA，该考虑全参微调了\n\t问“rank 设多少”，他想听的不是一个数字。他想听你知不知道这个数字背后的权衡：\n\t“rank 控制的是低秩矩阵的表达能力。我会从 8 或 16 起步，根",
+        "score": 18.077272193502534
+      },
+      {
+        "chunk_id": "c99298514243dd8f83f23174e3bcc308d4b4a00297a7a8eb3741431d20c80a05",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答",
+          "知识拓展",
+          "Q6：面试里怎么回答“为什么自部署”？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425,
+          4538,
+          4602
+        ],
+        "section_start_paragraph": 4603,
+        "section_end_paragraph": 4603,
+        "start_char": 0,
+        "end_char": 86,
+        "text": "先说硬约束，例如数据、权重或模型控制；再说流量与SLO是否足以支撑固定资源；然后说团队承担了哪些运维责任；最后给出同条件压测和TCO结果。不要只回答“安全、便宜、性能高”。",
+        "score": 18.02368304923693
+      },
+      {
+        "chunk_id": "7fb1043dc45880ed3b4944e79bc052869284f84a2650915d6f7d22885397df60",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425
+        ],
+        "section_start_paragraph": 4426,
+        "section_end_paragraph": 4431,
+        "start_char": 0,
+        "end_char": 325,
+        "text": "·云API适合先验证业务、流量波动大、团队不想维护GPU的场景，代价是模型和底层优化控制较少；\n·托管推理允许部署指定模型或权重，但把GPU调度、服务扩缩容等工作交给平台，控制力和运维成本居中；\n·自部署适合模型权重必须可控、数据边界严格、流量足够稳定，且团队有推理与GPU运维能力的场景；\n· vLLM、SGLang、TensorRT-LLM属于自部署或托管服务里的推理引擎选择，Ollama和llama.cpp更偏本地、边缘和轻量运行，不能把它们和部署模式混成一题；\n·最终选型要用同一模型、同一硬件和真实流量压测，比较质量、SLO内Goodput与每个成功任务的总成本。\n一句话：先按业务约束选“谁来负责部署”，再按模型、硬件和负载选推理引擎。",
+        "score": 17.9993866053748
+      },
+      {
+        "chunk_id": "3ee31dc054f2bc060e61bab87a722b85352e011e302031425bcebe64eda5c38e",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "AI Agent",
+          "Agent学习路线",
+          "\t第四步：工具与协议--Agent的上限由工具决定",
+          "工具设计决定Agent上限",
+          "工具粒度：太细会跑断，太粗会失控。"
+        ],
+        "heading_paragraphs": [
+          1300,
+          1301,
+          1660,
+          1662,
+          1750
+        ],
+        "section_start_paragraph": 1751,
+        "section_end_paragraph": 1768,
+        "start_char": 350,
+        "end_char": 750,
+        "text": "_after_sales。这种工具太粗了。Agent调用后，里面到底做了什么，它不知道。返回一个“处理成功”，也不知道成功在哪里。出错了，也不知道是订单不存在、支付失败、库存不足，还是物流异常。工具太粗，Agent表面省事。但系统变成黑盒。\n合理粒度：围绕一个业务动作封装。比较合理的粒度是：\n一个工具完成一个清晰的业务动作，并返回可判断的结构化结果。比如：\n·get_order_detail：查询订单完整状态\n·check_refund_policy：判断当前订单是否满足退款规则\n·create_refund_draft：创建退款申请草稿\n·confirm_refund_submit：用户确认后提交退款\n·search_service_logs：查询指定服务日志\n·query_api_latency：查询接口延迟指标\n·get_deploy_records：查询发布时间段内的发布记录。\n这",
+        "score": 17.69147317439759
+      },
+      {
+        "chunk_id": "4cdd2b30c826e2c0f40f8cb0dbb8938935692046556baf92117d73213456cd9b",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "四、rank 和 alpha：面试最爱挖的两个参数",
+          "alpha 又是干嘛的"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3988,
+          4002
+        ],
+        "section_start_paragraph": 4003,
+        "section_end_paragraph": 4012,
+        "start_char": 0,
+        "end_char": 353,
+        "text": "\tlora_alpha 是一个缩放因子。\n\tLoRA 旁路的输出，实际上会乘上 alpha / r 这个系数，再加回主干。\n\tW_new = W + (alpha / r) × B × A\n\t你可以把它理解成这条旁路的“音量旋钮”。\n\t它控制 LoRA 学到的东西，以多大的强度叠加到原模型上。\n\t实践里有个常见经验：\n\talpha 通常设成 rank 的 2 倍左右。 比如 rank=8 配 alpha=16，rank=16 配 alpha=32。\n\t为什么要除以 r？\n\t因为这样当你调大 rank 时，旁路输出的整体幅度不会跟着剧烈变化，调参更稳定，不至于换个 rank 就得重调学习率。\n\t面试时能说清“alpha/r 是缩放，目的是让 rank 变化时训练更稳定”，就比只会填默认值的人强一截。",
+        "score": 17.484964444870894
+      },
+      {
+        "chunk_id": "2e46466b737d6675b0e8ad9184c2debdef63584b08306b91ba7fae48ba523e4a",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "SFT、RLHF、DPO：微调方法全景认知",
+          "RLHF：让模型学会“人更喜欢哪个答案”"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3541,
+          3633
+        ],
+        "section_start_paragraph": 3634,
+        "section_end_paragraph": 3645,
+        "start_char": 0,
+        "end_char": 280,
+        "text": "RLHF，全称 Reinforcement Learning from Human Feedback，基于人类反馈的强化学习。\n一句话解释：\nRLHF 不是给模型一个标准答案，而是告诉模型：多个候选答案里，人类更喜欢哪一个。\n比如同一个投诉问题，模型给了两个回答。\nA：\n“不符合规则，不能退。”\nB：\n“我理解你现在比较着急。退款需要先确认订单状态和商品类型，如果不满足自动退款条件，我可以帮你看是否需要转人工处理。”\n这两个回答不一定是“一个绝对错，一个绝对对”。\n但业务可能明显更喜欢 B。\n因为 B 更稳、更礼貌，也给了后续处理路径。\n这就是偏好问题。",
+        "score": 17.46059541025089
+      },
+      {
+        "chunk_id": "c25968cc3b48e05df61a7eff4c7873cc100a0f24a598bcd226c2104df541e346",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "显存还是不够，量化、卸载和分离式推理怎么选？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4706
+        ],
+        "section_start_paragraph": 4707,
+        "section_end_paragraph": 4737,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "这些方案解决的不是同一个问题。\n方案\n主要解决什么\n典型收益\n主要代价\nPagedAttention\n预留和碎片浪费\n提高KV池有效利用率和可服务并发\n块管理与内核路径更复杂\nPrefix Cache\n公共前缀重复计算和复制\n降低命中请求TTFT，复用KV块\n依赖重复前缀，占用缓存容量\nFP8 KV Cache\n每个Token的KV字节数过高\n相比BF16/FP16原始数据通常接近减半\n需要硬件和内核支持，必须做质量校准\nCPU、NVMe或远端卸载\nGPU工作集装不下\n用更大、更便宜的存储扩展容量\n数据传输增加延迟，受PCIe或网络带宽约束\nPrefill/Decode分离\n两阶段资源特征和延迟目标互相干扰\n分别调优TTFT与ITL，控制尾部ITL\n需要传输KV，架构和调度更复杂\nvLLM的量化KV文档支持FP8 KV Cache，并建议通过校准获得更可靠的缩放因子。精度从16位降到8位，",
+        "score": 17.413992462265853
+      },
+      {
+        "chunk_id": "21fe839ca39a88cfb7c519b45fdd00b09a8b1a6b5b9946b38df93e4e5241dea3",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "知识拓展",
+          "Q2：开启PagedAttention后，显存占用为什么看起来还是很高？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4756,
+          4759
+        ],
+        "section_start_paragraph": 4760,
+        "section_end_paragraph": 4760,
+        "start_char": 0,
+        "end_char": 84,
+        "text": "很多引擎会预先建立较大的KV块池，把空闲显存尽量留给后续请求。监控里的“已保留显存”不等于“都被有效Token占用”，要同时看KV块使用率、可用块数和活跃Token数。",
+        "score": 17.337620296018414
+      },
+      {
+        "chunk_id": "f26c47475728333c9ab6a85b025026d6386675f6637a5404dbb9827680adeef5",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "RAG检索增强",
+          "向量数据库解决了什么问题：ANN检索原理",
+          "向量索引：ANN如何在速度与精度之间取得平衡"
+        ],
+        "heading_paragraphs": [
+          443,
+          559,
+          582
+        ],
+        "section_start_paragraph": 583,
+        "section_end_paragraph": 587,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "向量数据库不做暴力全量计算，而是预先构建一个特殊的索引结构，让检索时只需访问一小部分向量就能够就能找到近似的最近邻--这就是ANN（Approximate Nearest Neighbor，近似最近邻搜索）。ANN不保证找到绝对最近邻，但在实践中找到的结果精度足够高（通常95%+），二速度提升数量级。\n目前主流的两类向量索引算法是：HNSW（Hierarchical Navigable Small Word，分层可导航小世界图）：HNSW构建了一个层级结构的图：最顶层是少量节点（稀释，高速公路）；底层是所有节点（全量节点，精确计算）。检索时从顶层入口进入，沿图中的邻居边快速导航，逐层下降，像GPS导航一样越来越精细，最终定位到目标附近的最近邻。\nHSNW的优势是查询速度极快、精度高，是Milvus、Qdrant、Weaviate等主流向量数据库的默认索引。代价是构建索引时内存占用较大。\nI",
+        "score": 17.314371544443357
+      },
+      {
+        "chunk_id": "bb2513a2ceaa5e07d22cb79b759fbcef5d1cf7e746085107929ecbe602ef8711",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "先搞清楚：全参微调到底贵在哪"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3928
+        ],
+        "section_start_paragraph": 3929,
+        "section_end_paragraph": 3943,
+        "start_char": 350,
+        "end_char": 434,
+        "text": "只要你要更新全部参数，梯度和优化器状态就甩不掉，显存就降不下来。\n那有没有办法，只更新一小部分参数，让梯度和优化器状态只跟着这一小部分走？\n这就是 LoRA 的出发点。",
+        "score": 17.146893622304685
+      },
+      {
+        "chunk_id": "dfb79e0ef4051c75fe98fcb00312536f782f0ef3a18d5e2dd42edc4651a6fef7",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "四、rank 和 alpha：面试最爱挖的两个参数",
+          "还有一个常被忽略的：加在哪些层"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3988,
+          4013
+        ],
+        "section_start_paragraph": 4014,
+        "section_end_paragraph": 4038,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\tLoRA 不是无脑加在所有层上。\n\t它有一个 target_modules 参数，决定旁路矩阵挂在哪些权重上。\n\t最早的 LoRA 论文主要加在注意力的 q_proj、v_proj 上\n\t现在更常见的做法是加全一点：q/k/v/o 加上 FFN 的几个投影层\n\t加的层越多，可训练参数越多，效果可能更好，但开销也更大\n\t这也是一个权衡点。\n\t面试里如果你能主动提一句“我把 LoRA 加在了注意力和 FFN 的投影层上”，会显得你真的调过，而不是套了个默认配置。\n\t模块\n\t作用\n\t加入 LoRA 后可调整什么\n\tq_proj\n\t生成 Query\n\t参与决定关注哪些位置\n\tk_proj\n\t生成 Key\n\t参与决定位置之间如何匹配\n\tv_proj\n\t生成 Value\n\t被注意力聚合的信息\n\to_proj\n\t对注意力聚合结果做输出投影\n\t聚合结果如何映射回隐藏表示\n\tgate_proj、up_pr",
+        "score": 17.08474731478175
+      },
+      {
+        "chunk_id": "cfca7dab7d9179256bfddf7c8f3353bc9c65ea4f2fb8dcb632b1fb9cd7626cf2",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Function Calling：大模型如何调用工具，为什么是Agent的基础",
+          "生产系统必须设置的安全边界"
+        ],
+        "heading_paragraphs": [
+          395,
+          419
+        ],
+        "section_start_paragraph": 420,
+        "section_end_paragraph": 425,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "工具白名单：只能调用后端注册的工具，不能把模型生成的名称直接用于反射、Shell或SQL执行。（反射执行是指程序运行时，根据字符串形式的类名、函数名或方法名，动态查找并调用对应代码。）\nSchema校验不等于业务校验：strict：true只能提高参数符合Schema的可靠性，不能证明：订单真实存在；用户有权访问；库存足够；当前状态允许退款。这些必须由后端判断。\n身份信息来自可信上下文：如user_id<-登录令牌或服务器Session；\norder_id<-模型工具参数。\n写操作必须防重复：退款、支付、创建工单等操作需要：Idempotency Key（幂等键）；请求去重；必要时让用户二次确认；记录操作审计；重试时判断操作是否安全。\n限制Agent循环：至少设置：最大工具调用次数；最大执行轮数；单次工具超时；整体任务超时；连续无进展检测；Token和成本上限。否则模型可能在两个工具之间反",
+        "score": 17.04422190704945
+      },
+      {
+        "chunk_id": "35fd4db88eb9ef0c0bd295ba37947060c40f2d08bbb15c7e3679ad0b40ac78b8",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "AI Agent",
+          "Agent学习路线",
+          "\t多Agent上下文、消息和Token怎么治理",
+          "简要回答"
+        ],
+        "heading_paragraphs": [
+          1300,
+          1301,
+          3166,
+          3177
+        ],
+        "section_start_paragraph": 3178,
+        "section_end_paragraph": 3186,
+        "start_char": 350,
+        "end_char": 565,
+        "text": "预算中分配。\n·不同任务走不同模型。 摘要、分类、格式转换可以路由到小模型，复杂规划、最终合成和高风险审查再使用强模型，但路由必须经过评测。\n多Agent治理不是把一个大上下文切成几份，而是把对话变成独立工作区，把协作变成带因果的事件，把Token变成可预留、可回收的资源。\n一个子任务从编排器派发到最终汇总，如何通过独立Thread隔离过程、通过Artifact与事件引用交接结果，并让所有并行分支共同受全局预算和递归边界约束。",
+        "score": 17.007345490234734
+      },
+      {
+        "chunk_id": "f3a8be68718e2c47918fb7e104443617679e1d6addccd8e1d4a697ff5f959fd2",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型服务怎么压测？吞吐最高不等于能上线",
+          "详细回答",
+          "TPS为什么高，不代表服务能上线？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4935,
+          4953,
+          5016
+        ],
+        "section_start_paragraph": 5017,
+        "section_end_paragraph": 5026,
+        "start_char": 0,
+        "end_char": 358,
+        "text": "先把TPS说清楚。\n大模型报告里常见三种Token吞吐：\n输入Token/s，反映Prefill处理量；\n输出Token/s，反映系统为所有请求生成Token的总速度；\n总Token/s，把输入和输出相加。\n它们不能混着比较。两个方案都显示3000 Token/s，一个可能擅长吞长Prompt，另一个可能擅长持续Decode。\n随着并发升高，Continuous Batching通常会让GPU利用率和总吞吐先上升。继续加压后，吞吐逐渐饱和，排队时间、TTFT和TPOT却会快速变差。\n这就是延迟—吞吐取舍\n并发上升后，为什么原始吞吐的最高点不是上线容量。容量拐点之前，批处理收益能同时抬高吞吐与Goodput；越过拐点后，排队和资源争用让越来越多请求违反SLO，即使GPU仍在吐Token，业务可用容量已经下降。",
+        "score": 16.92877405261647
+      },
+      {
+        "chunk_id": "7a8a9c9980bcb8154fae6ed3e6a191e243f0732cef5b673bc336c61e31f77fd6",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "什么时候微调、什么时候RAG？选型决策框架",
+          "七、面试怎么答"
+        ],
+        "heading_paragraphs": [
+          3540,
+          4126,
+          4260
+        ],
+        "section_start_paragraph": 4261,
+        "section_end_paragraph": 4274,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\t“你这个项目，为什么用 RAG 不用微调？”或者“什么时候该微调，什么时候该 RAG？”\n\t“我判断的核心是先定位问题：模型效果不好，是因为它'不知道'，还是因为它'做不好'。\n\t如果是缺知识——比如要回答公司内部文档、实时数据、要能追溯来源——我用 RAG。因为这类知识量大、会变、还要可追溯，硬训进参数代价太高，改一次就得重训，还可能引发灾难性遗忘。RAG 改文档就能秒级更新。\n\t如果是缺行为——比如要固定输出格式、特定语气、专业判断风格——我会先看 Prompt 和 few-shot 能不能解决，因为它最便宜。Prompt 搞不定、又有高质量示范数据，才上微调，把行为对齐进模型。\n\t具体我会从四个维度权衡：数据量是海量文档还是少量高质量示范，任务是补事实还是改行为，知识更新频率高不高，以及一次性和长期维护的成本。\n\t成本上我的优先级是 Prompt < RAG < 微调，能用前面的解",
+        "score": 16.916958637076842
+      }
+    ],
+    "vector": [
+      {
+        "chunk_id": "663fa4fdc69e70a31f48cf016eab0ff8c73f6d4c57bbfcf24d96be653abc774b",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "三、为什么“低秩”就够用了"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3970
+        ],
+        "section_start_paragraph": 3971,
+        "section_end_paragraph": 3987,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "“你用一个这么小的矩阵去近似一个大矩阵，信息不会丢吗？效果能行吗？”\n答案藏在一个观察里：\n大模型在适配下游任务时，权重真正需要改变的方向，其实没那么多。\n换句话说，微调带来的权重变化量 ΔW，虽然形状很大，但它“本质上”是个低秩矩阵——它真正有效的信息维度很低。\n打个比方。预训练好的模型已经会了 99% 的通用能力。\n你做微调，不是把它重新教一遍，而是在原有能力上做一点“微调整”。\n这点调整，用不着动用一个满秩的大矩阵。\n一个低秩矩阵就能把这个“调整方向”表达得差不多。\n这张图回答的是：为什么两个瘦长的小矩阵相乘，能顶替一个大矩阵的更新。\n一个 d×d 的大矩阵，被拆成 d×r 和 r×d 两个小矩阵。中间的 r 就像一个瓶颈，强制让信息从一个很窄的通道流过。这个瓶颈逼着模型只学最关键的变化方向，而不是漫无目的地乱改。\n所以低秩不是“偷工减料”。\n它是一个假设：微调要学的东西，本来就是低",
+        "score": 0.5918050923828034
+      },
+      {
+        "chunk_id": "01ef9d2ce377d97d530705b95759bb5912b8deb8aa5e1cec13a906f064c6e6b6",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "先搞清楚：全参微调到底贵在哪"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3928
+        ],
+        "section_start_paragraph": 3929,
+        "section_end_paragraph": 3943,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "要理解 LoRA 为什么省，得先知道全参微调为什么贵。\n很多人以为微调贵是因为“模型参数多”。\n这只说对了一半。真正吃显存的，不只是模型权重本身。\n我们以一个 7B 模型为例，用最常见的 Adam 优化器，按 FP16 精度算一笔账：\n·模型权重：7B 参数，约 14GB\n·梯度：每个参数都要存一份梯度，又是约 14GB\n·优化器状态：Adam 要为每个参数存动量和方差两份，约 28GB（甚至更多，常用 FP32 存）\n光这三块加起来就奔着 70GB 去了。还没算前向传播的激活值。\n这张图回答的是：全参微调的显存大头不是模型权重，而是梯度和优化器状态。\n你看，权重只占一份，但梯度是一份，Adam 优化器状态是两份。 真正训练时，可训练参数的“伴生开销”比权重本身还大。\n所以核心矛盾很清楚：\n只要你要更新全部参数，梯度和优化器状态就甩不掉，显存就降不下来。\n那有没有办法，只更新一小部分参数，",
+        "score": 0.5888360736042381
+      },
+      {
+        "chunk_id": "13876b06fdc5137bb3ef6a2755e6aa5d136692a7505250a234927e1942d5b67c",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "五、QLoRA：把“便宜”再往死里压一压"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4039
+        ],
+        "section_start_paragraph": 4040,
+        "section_end_paragraph": 4058,
+        "start_char": 350,
+        "end_char": 541,
+        "text": "\t这一压，效果立竿见影：\n\t·原始权重从 16bit 压到 4bit，显存直接降到约四分之一\n\t·14GB 的 7B 模型，量化后只占 3.5GB 左右\n\t·配合 LoRA 本身极小的可训练参数\n\t最终结果就是：单张 24GB 的消费级显卡，能微调 30B 甚至更大的模型。\n\t这就是为什么 QLoRA 一出来，垂类微调的门槛被砸穿了。\n\t普通人、小团队，也能在自己的卡上训模型了。",
+        "score": 0.5863012100483799
+      },
+      {
+        "chunk_id": "bb2513a2ceaa5e07d22cb79b759fbcef5d1cf7e746085107929ecbe602ef8711",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "先搞清楚：全参微调到底贵在哪"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          3928
+        ],
+        "section_start_paragraph": 3929,
+        "section_end_paragraph": 3943,
+        "start_char": 350,
+        "end_char": 434,
+        "text": "只要你要更新全部参数，梯度和优化器状态就甩不掉，显存就降不下来。\n那有没有办法，只更新一小部分参数，让梯度和优化器状态只跟着这一小部分走？\n这就是 LoRA 的出发点。",
+        "score": 0.5849604082812473
+      },
+      {
+        "chunk_id": "79c5116e3a6ce924ac929ba576888d153d3230716b85c01c50ef1ab963f920af",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型服务怎么压测？吞吐最高不等于能上线",
+          "知识拓展",
+          "Q4：压测时要不要开启Prefix Cache？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4935,
+          5058,
+          5065
+        ],
+        "section_start_paragraph": 5066,
+        "section_end_paragraph": 5066,
+        "start_char": 0,
+        "end_char": 90,
+        "text": "先跑关闭或冷缓存基线，再按线上真实共享前缀和命中率复测。全量命中会高估容量，全量关闭又会漏掉真实收益。Prefix Cache的机制可以回看《KV Cache为什么会吃光显存？》。",
+        "score": 0.5800622501394225
+      },
+      {
+        "chunk_id": "def32e265e3242ff63199dd1427eafb03925241afdb52661af98499eddb21023",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "知识拓展",
+          "Q5：模型支持128K上下文，就能同时跑很多条128K请求吗？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4756,
+          4765
+        ],
+        "section_start_paragraph": 4766,
+        "section_end_paragraph": 4766,
+        "start_char": 0,
+        "end_char": 75,
+        "text": "上下文窗口说明单条请求在模型和服务配置上允许多长，不代表GPU能高并发承载这个长度。容量规划要把单请求KV大小乘上活跃请求数，再扣除权重和运行时显存。",
+        "score": 0.5776059315157932
+      },
+      {
+        "chunk_id": "82285d4ea3fae7ed69e20ff64fb4eec4ff3d200d832e7b9cd0d213970c6cb946",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答",
+          "知识拓展",
+          "Q5：应用开发者需要学到多深？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425,
+          4538,
+          4547
+        ],
+        "section_start_paragraph": 4548,
+        "section_end_paragraph": 4601,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "不要求每个人都写CUDA内核，但要能讲清责任边界、容量和SLO，知道模型为什么放不下、并发为什么上不去、故障时该看哪一层。否则你只能把所有问题都归因成“模型太慢”。\n① 讲清责任边界：一次请求经过哪些层。\n用户请求\n   ↓\n应用层：Prompt、RAG、Agent 编排、工具调用\n   ↓\n网关层：认证、限流、路由、超时\n   ↓\n推理服务：排队、批处理、KV Cache 管理\n   ↓\n模型计算：Prefill、Decode\n   ↓\n硬件资源：GPU、显存、网络、存储\nAgent 串行调用了五次模型，响应慢可能来自应用编排；请求排队很久，可能是服务容量不足。两者都不能简单归因于模型计算慢。\n② 理解容量：为什么模型放不下，并发上不去。\n推理显存可以粗略拆成：\n所以：\n权重能装下，不代表请求能跑起来：还需要给计算和 KV Cache 留空间。\n单请求能跑，不代表高并发能跑：更多活跃序列",
+        "score": 0.5695162489682645
+      },
+      {
+        "chunk_id": "4f29217d40ce12cf3dbd63e70993ab55c418ef3f7db6f43d04b5206de549b6d1",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "五、QLoRA：把“便宜”再往死里压一压",
+          "QLoRA 的代价"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4039,
+          4065
+        ],
+        "section_start_paragraph": 4066,
+        "section_end_paragraph": 4070,
+        "start_char": 0,
+        "end_char": 162,
+        "text": "QLoRA 省显存，但也有代价：\n·训练速度通常比 LoRA 慢一些：因为前向传播时要不断把 4bit 权重反量化回计算精度\n·精度上理论上略有损失：虽然 NF4 已经做得很好，但 4bit 终究比 16bit 信息少\n所以选型逻辑很清楚：\n显存够用，优先 LoRA；显存实在不够、卡不够大，再上 QLoRA 用时间换空间。",
+        "score": 0.5691837377052007
+      },
+      {
+        "chunk_id": "fadad12a7f9306293225f7564d7553af1051ee57efb02cf8d2bebb8e84337f39",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "多模态入门",
+          "多模态大模型：图片和语音是怎么被模型“看懂”的？",
+          "知识拓展",
+          "Q1：视觉Token越多，效果就一定越好吗？"
+        ],
+        "heading_paragraphs": [
+          5208,
+          5209,
+          5278,
+          5279
+        ],
+        "section_start_paragraph": 5280,
+        "section_end_paragraph": 5280,
+        "start_char": 0,
+        "end_char": 78,
+        "text": "不一定。更高分辨率和更小Patch能保留更多细节，但会增加Attention计算、显存、延迟和输入成本。如果任务只需要判断大类，把每个像素都保住反而是浪费。",
+        "score": 0.5669642356077628
+      },
+      {
+        "chunk_id": "a7dc1c30ae07767abb5042f92fc76c762900ff95c60fc520ceaf858b461cc56a",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "知识拓展",
+          "Q6：面试里怎么回答“KV Cache怎么优化”？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4756,
+          4767
+        ],
+        "section_start_paragraph": 4768,
+        "section_end_paragraph": 4769,
+        "start_char": 0,
+        "end_char": 125,
+        "text": "先用公式说明容量由层数、KV头、维度、长度、并发和精度决定；再区分分页、复用、量化、卸载和分离式推理各自解决的瓶颈；最后落到监控指标和压测证据。不要只报一串框架参数。\n能判断显存浪费发生在分配、复用、精度、存储层级还是调度阶段，才算真正懂大模型推理。",
+        "score": 0.5665065854826408
+      },
+      {
+        "chunk_id": "4e2daef3e4473d85791328930522f7aa7ddae74fad6e6290a8bb5834f5b8d0f1",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "SFT、RLHF、DPO：微调方法全景认知",
+          "八、工程上怎么证明微调有收益"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3541,
+          3835
+        ],
+        "section_start_paragraph": 3837,
+        "section_end_paragraph": 3887,
+        "start_char": 350,
+        "end_char": 637,
+        "text": "大模型调用量减少多少\n如果效果差不多，但成本降了一半，这也是非常实在的收益。\n4. 风险指标\n高风险业务要看风险有没有下降。\n比如：\n·越权动作率\n·错误放行率\n·错误拒答率\n·投诉率\n·回滚次数\n·审批触发率\n微调不能只追求“答得更像人”。\n它还要让系统更稳。\n5. 回归测试\n每次换 Prompt、换 RAG、换工具、换模型、做微调，都要跑回归。\n否则很容易出现：\n这个场景好了，另一个场景坏了。\n训练集效果提高了，线上真实问题变差了。\n格式更稳了，但拒答边界被破坏了。\n所以要有固定回归集。\n尤其要保留历史失败 case。\n失败样本不是垃圾，是下一轮优化最值钱的数据。",
+        "score": 0.5660505756292752
+      },
+      {
+        "chunk_id": "d25f32a2b3d829156904c2e0a20229b00b2453f160fcd38edaa38a767975e9bc",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型服务怎么压测？吞吐最高不等于能上线",
+          "详细回答",
+          "压测前，先固定什么？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4935,
+          4953,
+          4954
+        ],
+        "section_start_paragraph": 4955,
+        "section_end_paragraph": 4974,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "公开跑分可以帮你筛候选，不能直接变成自己的容量结论。\n至少固定这些变量：\n变量\n为什么必须记录\n模型、Tokenizer、聊天模板\n同一句文本可能得到不同Token数，模板也会改变真实输入\n精度、量化、并行方式\n直接影响权重占用、Kernel和跨卡通信\nGPU型号、数量、驱动和引擎版本\n换硬件或版本后，结果不能直接横向比较\n最大上下文、KV Cache配置、调度参数\n决定长请求容量、Batch和排队行为\n流式模式、采样参数、停止条件\n影响TTFT测量、输出长度和实际计算量\n网关、网络和客户端位置\n决定测的是纯引擎，还是完整生产链路\n建议分两层测。\n第一层是引擎基准，去掉业务网关和公网波动，定位GPU、KV Cache与调度上限。\n第二层是端到端压测，保留鉴权、路由、流式协议、网络和超时，回答用户实际会等多久。\n两层数据都要留。只测引擎，容易把网关和网络问题漏掉；只测端到端，又很难定位时间花",
+        "score": 0.5636959191660408
+      },
+      {
+        "chunk_id": "c89fd27c1d641898b0d8699e593db90ff550ad1edc0047ba00ae1e7938f2a75c",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "云API、托管推理还是自部署？大模型部署方案怎么选",
+          "简要回答",
+          "知识拓展",
+          "Q5：应用开发者需要学到多深？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4415,
+          4425,
+          4538,
+          4547
+        ],
+        "section_start_paragraph": 4548,
+        "section_end_paragraph": 4601,
+        "start_char": 700,
+        "end_char": 1061,
+        "text": "约定 SLO 的请求数量\n错误率、业务成功率\n服务是否可靠，结果是否真正有用\n④根据现象选择排查层，而不是直接换模型。\n现象\n优先检查\n很久不出第一个字，之后输出正常\n应用前置步骤、排队时间、输入长度和 Prefill\n很快开始，但后面生成很慢\nDecode、资源竞争、活跃并发和内存带宽\n单请求正常，并发一高就超时\n队列、限流、推理容量及超时配置\n加长上下文后 OOM（Out of Memory，内存不足）\nKV Cache、临时计算空间和可用显存\n模型调用很快，整个 Agent 很慢\n工具耗时、串行步骤、重复调用和重试\n返回速度正常，但答案变差\n模型版本、模板、上下文、截断及采样配置\n这些是排查入口，不是仅凭现象就能确定的结论。应通过请求追踪，把应用、检索、工具、排队和模型生成的耗时拆开，再用压测验证修改效果。",
+        "score": 0.5634923811830793
+      },
+      {
+        "chunk_id": "32ea6a34fd88da29fbd16a3c62a362b9fb53fa90f361d12e079c711ab3c62e30",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "LoRA 还有一个被低估的好处：部署灵活"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4071
+        ],
+        "section_start_paragraph": 4072,
+        "section_end_paragraph": 4091,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "很多人只看到 LoRA 省训练显存。\n其实它在部署上还有一个杀手锏。\n因为 LoRA 训出来的，只是那两个小矩阵——通常就几十 MB 到几百 MB。\n基座模型一点没变。\n这意味着什么？\n一个基座模型，可以同时挂载多个不同的 LoRA 适配器，按业务需求随时切换。\n\t这张图回答的是：为什么 LoRA 在多业务场景下特别省。\n\t中间是一个共享的基座模型，旁边挂着客服 LoRA、代码 LoRA、文案 LoRA 等好几个小适配器。请求来了，需要哪个能力就挂哪个，基座只加载一份。\n\t对比一下全参微调：\n\t·全参微调每个业务都得存一整个独立的大模型\n\t·LoRA 只需存一个基座 + 多个几百 MB 的小适配器\n\t三个业务，全参微调要存 3 个 7B 模型（约 42GB），LoRA 只要 1 个基座加 3 个小文件（约 14GB 多一点）。\n\t这种“一基座多适配器”的模式，在真实生产环境里非常实用。\n\t",
+        "score": 0.5627575909244703
+      },
+      {
+        "chunk_id": "b5b36480a1041d8d6d2414cd9b51fdf9ef7f6aa170b2394ac059735b2f3d09bb",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "一条请求的KV Cache到底有多大？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4647
+        ],
+        "section_start_paragraph": 4648,
+        "section_end_paragraph": 4662,
+        "start_char": 350,
+        "end_char": 480,
+        "text": "Tensor Parallel如何切分KV头、模型是否采用MQA、GQA、MLA或滑动窗口，也会改变每张卡的实际占用，所以公式用于容量初算，最终仍要以引擎指标和压测为准。\n真正容易忽略的是：模型权重是相对静态的，KV Cache却是随请求实时增长的动态工作集。",
+        "score": 0.5621124302652177
+      },
+      {
+        "chunk_id": "d6543d85b4584f0f5434c8d38cbbd945e5581d83c5cad9becff2652b92f5a9a0",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "SFT、RLHF、DPO：微调方法全景认知",
+          "十、最后提醒"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3541,
+          3902
+        ],
+        "section_start_paragraph": 3903,
+        "section_end_paragraph": 3911,
+        "start_char": 0,
+        "end_char": 174,
+        "text": "录友一定要记住：\n微调不是大模型应用的默认选项。\n很多问题，Prompt、RAG、工具、规则、工作流就能解决。\n但微调也不是没用。\n当你要把稳定行为、业务偏好、风险边界、成本结构沉进模型里，微调就有价值。\n关键不是会不会喊 SFT、RLHF、DPO。\n关键是你能不能说清楚：\n为什么要训，训什么，怎么评估，失败了怎么回滚。\n这才是工程里的微调认知。",
+        "score": 0.5592787272932132
+      },
+      {
+        "chunk_id": "a33397198fe289e4d5635612e9c182c8a9fe0f5b3017e53b4a84ffab74468229",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "什么时候微调、什么时候RAG？选型决策框架",
+          "四、选型决策流程：先 Prompt，再 RAG，最后才微调"
+        ],
+        "heading_paragraphs": [
+          3540,
+          4126,
+          4220
+        ],
+        "section_start_paragraph": 4221,
+        "section_end_paragraph": 4237,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\t定位完问题，还有一个顺序问题。\n\t很多录友一遇到效果不好，第一反应就是\"上微调\"。\n\t这是新手最典型的毛病：一上来就掏最重的武器。\n\t正确的顺序是按成本从低到高试：\n\t这张图回答的是：拿到一个不达标的需求，该按什么顺序决策。\n\t第一步，缺什么，先定位。 是缺知识、缺行为，还是两样都缺。\n\t·缺知识 → RAG。可更新、可追溯，不用动模型。\n\t·两样都缺 → RAG + 微调一起上（下一节细讲）。\n\t·缺行为 → 先别急着微调，再问一句：Prompt / few-shot 能不能调好？\n\t\t··能 → 就用 Prompt。改个提示词、给两个示例就能解决的事，犯不上训模型。很多\"格式不稳\"的问题，其实 结构化输出 + JSON Schema 就治好了。\n\t\t··不能，且手里有示范数据 → 这才轮到微调。\n\t记住这条成本线：\n\tPrompt < RAG < 微调。\n\t能用 Prompt 解决的",
+        "score": 0.5578971719458808
+      },
+      {
+        "chunk_id": "ff4b95c813d620a5ad8d4b8fb6a3e61a69ea2b618aa04bc70e15669d534aa5bc",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "八、面试里怎么讲"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4103
+        ],
+        "section_start_paragraph": 4104,
+        "section_end_paragraph": 4116,
+        "start_char": 350,
+        "end_char": 685,
+        "text": "缩放因子，除以 r 是为了让 rank 变化时训练更稳定。LoRA 我会加在注意力的 q/k/v/o 和 FFN 的投影层上。\n\t如果显存实在不够，就上 QLoRA，把冻结的基座用 NF4 做 4bit 量化，适配器保持高精度，代价是训练慢一点、精度略有损失。\n\t另外 LoRA 在部署上也有优势，一个基座可以挂多个适配器按业务切换，不用为每个业务存一整个大模型。”\n\t这个回答能体现四件事：\n\t第一，你懂它为什么省（梯度和优化器状态）。\n\t第二，你懂它为什么能省（低秩假设）。\n\t第三，你懂参数背后的权衡（rank、alpha、target_modules）。\n\t第四，你懂工程落地（QLoRA、多适配器部署）。\n\t这比背一句“我们用 LoRA 微调了模型”强太多了。",
+        "score": 0.5566394179384135
+      },
+      {
+        "chunk_id": "8edd7afd023fe53b6f8a439cb1365f81ee9f4c8a039b0177a5af49af7d241ca3",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "SFT、RLHF、DPO：微调方法全景认知",
+          "SFT：给模型看高质量示范",
+          "SFT 不适合什么"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3541,
+          3579,
+          3603
+        ],
+        "section_start_paragraph": 3604,
+        "section_end_paragraph": 3613,
+        "start_char": 0,
+        "end_char": 159,
+        "text": "SFT 不适合把动态知识硬塞进模型。\n比如：\n·商品价格\t\t\t\t·库存状态\n·最新政策\t\t\t\t·公司制度\n·合同条款\t\t\t\t·产品功能说明\n这些信息变化频繁。\n今天训练进去，明天就可能过期。\n这类场景更应该用 RAG、数据库查询、工具调用。\nSFT 教模型“怎么答”，RAG 给模型“答题资料”。\n这个边界一定要分清。",
+        "score": 0.5542740230269362
+      },
+      {
+        "chunk_id": "5d932614dd5744360aa9b0cdd367f63317c3dd85465dea0a66ca6a2448f5e042",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型服务怎么压测？吞吐最高不等于能上线",
+          "详细回答",
+          "为什么不能只生成固定长度的随机Token？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4935,
+          4953,
+          4975
+        ],
+        "section_start_paragraph": 4976,
+        "section_end_paragraph": 4985,
+        "start_char": 350,
+        "end_char": 456,
+        "text": "感信息替换或移除，再按接近线上流量的方式重新发送请求，用于压测或质量评估。），或者按业务类型分别建流量桶。\n固定输出长度、忽略EOS适合做可重复的引擎对比；做上线容量测试时，还要补一轮遵守真实停止条件的流量回放。",
+        "score": 0.553465397118766
+      },
+      {
+        "chunk_id": "d5382f638375c8a7ab3eb6e6104c6c0421f5ce8450164580fbbfb1cd3be927cc",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "什么时候微调、什么时候RAG？选型决策框架",
+          "三、四个维度，把选型量化下来"
+        ],
+        "heading_paragraphs": [
+          3540,
+          4126,
+          4176
+        ],
+        "section_start_paragraph": 4177,
+        "section_end_paragraph": 4219,
+        "start_char": 700,
+        "end_char": 1100,
+        "text": "根稻草。\n\t知识经常变、改一次就得马上生效 → RAG。改知识库里的文档，下一次检索立刻生效，秒级更新。\n\t行为稳定、不会三天两头改 → 微调才划算。你不会每周改一次\"客服该用什么语气\"。\n\t想象一下：用微调把价格表训进模型，结果运营每天调价。你每天重训一遍模型？光想想就知道这条路走不通。\n\t凡是高频更新的东西，天然属于 RAG，不属于参数。\n\t4. 成本：一次性投入 vs 长期维护\n\tRAG 起步快：搭好检索链路，之后改知识就是改文档，几乎零额外训练成本。\n\t微调前期重：要准备标注数据、要训练、要评估，还要考虑模型迭代后的重训维护。\n\t别只算训练那一下的钱。微调真正的成本在长期维护：基座模型升级了要不要跟着重训？数据漂移了要不要补训？这些都是持续投入。\n\t四个维度看下来，你会发现一个规律：\n\t它们其实指向同一个判断——你缺的到底是\"知识\"还是\"行为\"。 数据量、更新频率、成本，都是在帮你",
+        "score": 0.55257224920779
+      },
+      {
+        "chunk_id": "21fe839ca39a88cfb7c519b45fdd00b09a8b1a6b5b9946b38df93e4e5241dea3",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "知识拓展",
+          "Q2：开启PagedAttention后，显存占用为什么看起来还是很高？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4756,
+          4759
+        ],
+        "section_start_paragraph": 4760,
+        "section_end_paragraph": 4760,
+        "start_char": 0,
+        "end_char": 84,
+        "text": "很多引擎会预先建立较大的KV块池，把空闲显存尽量留给后续请求。监控里的“已保留显存”不等于“都被有效Token占用”，要同时看KV块使用率、可用块数和活跃Token数。",
+        "score": 0.5519467393843809
+      },
+      {
+        "chunk_id": "5c9a94754fb2f3e954c8ef8f8c0fdeb042ba74bffbb943e582a34e57d1d8e492",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "简要回答"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4614
+        ],
+        "section_start_paragraph": 4615,
+        "section_end_paragraph": 4636,
+        "start_char": 700,
+        "end_char": 816,
+        "text": "dAttention\nKV 的分块分配和寻址方式\n减少预留浪费与碎片，不直接缩小每个数值\n它们的代价也不同：\n·量化可能引入数值误差，并增加量化、反量化处理。\n·卸载增加数据传输，可能降低生成速度。\n·分页需要块表和相应的寻址管理。",
+        "score": 0.5494414599899692
+      },
+      {
+        "chunk_id": "0c0c519e83bb6ea9a0fe5c0a1f75859d08a43890ec964beacb2a4c7360be1adb",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912
+        ],
+        "section_start_paragraph": 3913,
+        "section_end_paragraph": 3926,
+        "start_char": 0,
+        "end_char": 385,
+        "text": "这一篇解决“微调具体怎么训”的问题。\n因为不管你是做 SFT，还是做 DPO，真到了动手那一步，几乎都绕不开一个词：LoRA。\n现在你去看任何一个开源微调项目、任何一个垂类模型训练教程，十有八九用的都是 LoRA 或 QLoRA。\n为什么？因为它便宜。便宜到什么程度？\n原来要 8 张 A100 才能训的模型，用 QLoRA 一张消费级显卡就能跑起来。\n这就是它流行的根本原因。但便宜不等于你就懂了。\n面试官最爱在这里挖坑：\n“你用 LoRA 训的？那 rank 设的多少？为什么是这个值？”\n“lora_alpha 是干嘛的？”\n“你 LoRA 加在哪些层上？”\n“QLoRA 和 LoRA 差在哪？量化的是哪部分？”\n这几个问题，能把“只会跑脚本”的人和“真懂原理”的人一秒区分开。\n这篇我们不推公式。\n就把 LoRA 和 QLoRA 讲到你能自己回答上面这些问题。",
+        "score": 0.5489192342633983
+      },
+      {
+        "chunk_id": "6279384c1b43b752196a09bb2740f825339df3775f5c8d7b73690ecb24308d00",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "SFT、RLHF、DPO：微调方法全景认知",
+          "七、基模越来越强，微调还有没有必要"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3541,
+          3808
+        ],
+        "section_start_paragraph": 3809,
+        "section_end_paragraph": 3834,
+        "start_char": 350,
+        "end_char": 461,
+        "text": "或者“微调没用”更像工程答案。\n这张图回答的是：基模变强后，哪些微调价值会被抹平，哪些价值会留下来。\n图里红色路径表示低壁垒的“补通用知识”微调被新基模覆盖，绿色路径表示业务行为、偏好、成本和风险控制这些更稳定的微调价值。",
+        "score": 0.5483896255710795
+      },
+      {
+        "chunk_id": "1aa34c786582b283bead4811e69aaf5abe52ae7e43f10fc0aa24bc814f501134",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型服务怎么压测？吞吐最高不等于能上线",
+          "详细回答",
+          "一次完整压测应该怎么跑？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4935,
+          4953,
+          5037
+        ],
+        "section_start_paragraph": 5038,
+        "section_end_paragraph": 5045,
+        "start_char": 350,
+        "end_char": 458,
+        "text": "存冷热变化、请求取消、单副本故障和恢复。短跑不OOM，不代表几小时后没有内存泄漏、碎片或长尾恶化。\n每次只改一个主要变量。引擎、量化、并行、Batch参数和流量模型一起变，最终即使TPS提高，也解释不了收益来自哪里。",
+        "score": 0.5468319505661369
+      },
+      {
+        "chunk_id": "0706ab6218a44296bbda011ae1364853014bb0248c77e4dd673dc26a7fd56cbb",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Token、成本与延迟：大模型三个硬约束",
+          "成本"
+        ],
+        "heading_paragraphs": [
+          266,
+          283
+        ],
+        "section_start_paragraph": 284,
+        "section_end_paragraph": 291,
+        "start_char": 0,
+        "end_char": 277,
+        "text": "重点看这些费用到了真实业务里怎么被调用量、重试和多步链路放大。放大项：\n失败重试：超时重试一次，可能把同一份长Prompt再付一遍。\n多步Agent：一次用户请求，背后可能触发多次模型调用。\nRAG和Embedding：检索前的向量化、Rerank也可能有独立成本\n审核与评测：主模型回答后，再调一个模型做校验，同样要计费\n无效输出：用户看到一半就取消，已生成的Token通常仍然消耗资源。\n为什么一个看起来不贵的API，到了生产环境账单会突然放大。业务请求量会放大总调用量；重试、Agent多步调用和低命中请求，则会把一次业务请求扩成多次付费模型调用。",
+        "score": 0.5461448561304385
+      },
+      {
+        "chunk_id": "2eb78be2f9966b6e0fabd6832fe100ef0d143c4a7eeb956c8f20d32bbc4c0a16",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "为什么传统连续分配会浪费大量显存？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4673
+        ],
+        "section_start_paragraph": 4674,
+        "section_end_paragraph": 4690,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "请求的最终长度在开始时并不知道。\n如果每条请求都按最大长度预留一块连续显存，短请求会留下大量未使用空间；如果只按当前长度分配，序列增长时又需要寻找更大的连续区域。请求不断进入和退出后，空闲显存可能散落在多个小洞里，总量看着够，却找不到合适的连续空间。\n这里有三类浪费：\n·过度预留：按最大长度申请，实际只用了很短一段；\n·内部碎片：分配单元内部没有填满，按需分块后仍有尾块空余；\n·外部碎片：空闲空间被切散，无法满足连续申请。\nPagedAttention论文借鉴操作系统分页：把一条序列的KV Cache切成固定Token数的逻辑块，再通过块表映射到不连续的物理显存块。\n这样做之后：\n·序列增长时按需增加块，不用一开始按最大长度预留；\n·不同请求释放的物理块可以立刻回到公共池；\n·一条逻辑连续的序列，可以落在不连续的物理块上；\n·多个序列的公共KV块还可以通过引用计数共享。\n这张图回答的是：P",
+        "score": 0.5459260826201495
+      },
+      {
+        "chunk_id": "7ee2b785581255628a0da92937e4d928b596d6023afcf25a6b0e5323fb22c9ba",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "Prefill、Decode和连续批处理怎么把压力放大？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4663
+        ],
+        "section_start_paragraph": 4664,
+        "section_end_paragraph": 4672,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "Prefill和Decode消耗显存的方式不一样。\n前文《Token、成本与延迟：大模型应用的三个硬约束》已经拆过TTFT和TPOT，这里把它们继续落到GPU显存上。\n长Prompt进入Prefill后，会快速建立一大段KV Cache，所以长上下文请求可能在刚入场时就申请大量KV块。Decode每轮只追加少量Token，但请求迟迟不结束，缓存会一轮一轮继续增长。\n现代推理引擎通常还会做连续批处理，也叫Iteration-level或In-flight Batching：每轮Decode后，完成的请求退出，新请求立即加入，不必等整个固定Batch全部结束。Orca论文把这种思想称为迭代级调度。\n它提高了GPU利用率，却也让KV池成为调度中心：\n总KV Cache \t≈ \t所有活跃请求已处理Token数对应的KV之和\n当空闲KV块不足时，新请求只能排队；部分引擎会抢占已有请求并在之后重算或恢",
+        "score": 0.5453009174447134
+      },
+      {
+        "chunk_id": "9b71bc8edf195bf7831a4cf63b5086783c35d7689fc575dd636e587de6c07a45",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "LoRA 还有一个被低估的好处：部署灵活"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4071
+        ],
+        "section_start_paragraph": 4072,
+        "section_end_paragraph": 4091,
+        "start_char": 350,
+        "end_char": 420,
+        "text": " 个小文件（约 14GB 多一点）。\n\t这种“一基座多适配器”的模式，在真实生产环境里非常实用。\n\t也是面试时能体现你“懂工程落地”的好料。",
+        "score": 0.545189986172738
+      },
+      {
+        "chunk_id": "7a8a9c9980bcb8154fae6ed3e6a191e243f0732cef5b673bc336c61e31f77fd6",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "什么时候微调、什么时候RAG？选型决策框架",
+          "七、面试怎么答"
+        ],
+        "heading_paragraphs": [
+          3540,
+          4126,
+          4260
+        ],
+        "section_start_paragraph": 4261,
+        "section_end_paragraph": 4274,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\t“你这个项目，为什么用 RAG 不用微调？”或者“什么时候该微调，什么时候该 RAG？”\n\t“我判断的核心是先定位问题：模型效果不好，是因为它'不知道'，还是因为它'做不好'。\n\t如果是缺知识——比如要回答公司内部文档、实时数据、要能追溯来源——我用 RAG。因为这类知识量大、会变、还要可追溯，硬训进参数代价太高，改一次就得重训，还可能引发灾难性遗忘。RAG 改文档就能秒级更新。\n\t如果是缺行为——比如要固定输出格式、特定语气、专业判断风格——我会先看 Prompt 和 few-shot 能不能解决，因为它最便宜。Prompt 搞不定、又有高质量示范数据，才上微调，把行为对齐进模型。\n\t具体我会从四个维度权衡：数据量是海量文档还是少量高质量示范，任务是补事实还是改行为，知识更新频率高不高，以及一次性和长期维护的成本。\n\t成本上我的优先级是 Prompt < RAG < 微调，能用前面的解",
+        "score": 0.5445546198761386
+      },
+      {
+        "chunk_id": "6828bf62a1ce97fa576a6949a1e4e962c200e2e075454e76094529c1e8cec493",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型应用怎么稳定上线？网关、限流、监控、灰度与回滚",
+          "知识拓展",
+          "Q2：有多家模型供应商，失败时直接切备用模型可以吗？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          5071,
+          5195,
+          5198
+        ],
+        "section_start_paragraph": 5199,
+        "section_end_paragraph": 5199,
+        "start_char": 0,
+        "end_char": 87,
+        "text": "可以做降级，但不能把它当成无损切换。模型的Tokenizer、上下文、工具调用、结构化输出和安全行为都可能不同。备用模型也要提前跑回归集、做容量预留，并明确哪些任务允许降级。",
+        "score": 0.5443715260895868
+      },
+      {
+        "chunk_id": "1e42874f3d8088b1cd063d7c81f94005b91c227d02558108c46f1203f7a5b443",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "什么时候微调、什么时候RAG？选型决策框架",
+          "二、一句话判断：你缺的是\"知识\"还是\"行为\""
+        ],
+        "heading_paragraphs": [
+          3540,
+          4126,
+          4156
+        ],
+        "section_start_paragraph": 4157,
+        "section_end_paragraph": 4175,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\t很多复杂的选型题，其实一句话就能切开：\n\t先问自己——现在效果不好，是因为模型\"不知道\"，还是因为模型\"做不好\"？\n\t模型\"不知道\"，是知识问题：\n\t·它答不出公司内部文档里的内容\n\t·它说的产品信息是半年前的旧版本\n\t·它编造了一个根本不存在的条款\n\t这些，RAG。\n\t模型\"做不好\"，是行为问题：\n\t·输出格式忽对忽错，没法被代码稳定解析\n\t·语气不对，太官方或者太随意\n\t·在你的专业领域里，判断风格不够地道\n\t这些，微调（很多时候甚至 Prompt 就够，后面会讲）。\n\t举个最容易混的例子。\n\t你想做一个法律合同审查助手，效果不好。到底该 RAG 还是微调？\n\t得拆开看：\n\t·如果是\"它不知道最新的法律条文、不知道这家公司的历史合同\" → 这是知识问题 → RAG\n\t·如果是\"它知道条文，但审查报告写得乱七八糟、不像专业律师那个风格\" → 这是行为问题 → 微调\n\t同一个项目，不同的",
+        "score": 0.5441804609192202
+      },
+      {
+        "chunk_id": "b4565ddd8175633df4bb178556ad2caa16bbff655fe84189c56c584d4f49efd8",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "什么时候微调、什么时候RAG？选型决策框架",
+          "三、四个维度，把选型量化下来"
+        ],
+        "heading_paragraphs": [
+          3540,
+          4126,
+          4176
+        ],
+        "section_start_paragraph": 4177,
+        "section_end_paragraph": 4219,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\t“知识 vs 行为”能解决大部分判断。\n\t但面试官往往要你说得更细——具体从哪几个维度权衡？\n\t维度\n\t倾向 RAG\n\t倾向 微调\n\t数据量\n\t知识量大、文档海量，塞不进上下文\n\t有几百到几千条高质量、带标注的示范数据\n\t任务类型\n\t缺的是事实知识，模型“不知道”\n\t缺的是行为能力（风格 / 格式 / 语气 / 专业度）\n\t更新频率\n\t知识经常变，改一次就要马上生效\n\t行为稳定，不会三天两头改\n\t成本\n\t起步快，改文档即可、无需训练\n\t数据 + 训练 + 评估，一次性投入更高\n\t1. 数据量：你手里是\"海量文档\"还是\"高质量示范\"\n\t知识量大、文档海量、根本塞不进上下文 → RAG。几千份文档你不可能训进参数，也不可能全塞进 Prompt，只能检索。\n\t有几百到几千条高质量、带标注的示范数据 → 微调。微调吃的不是文档，是\"输入→理想输出\"的成对示范。\n\t注意这里的关键词：微调要的是示范",
+        "score": 0.5439624761230573
+      },
+      {
+        "chunk_id": "d114d5c2a4bb0287e66dfc53558fa4ba089f662f91ae625144150f69fb18889b",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "多模态入门",
+          "多模态能做什么？文档解析、图片问答、视频理解",
+          "知识拓展",
+          "Q4：多模态RAG能只存图片Embedding吗？"
+        ],
+        "heading_paragraphs": [
+          5208,
+          5291,
+          5384,
+          5391
+        ],
+        "section_start_paragraph": 5392,
+        "section_end_paragraph": 5392,
+        "start_char": 0,
+        "end_char": 58,
+        "text": "可以做，但通常不够。生产系统还需要保存OCR文本、结构元数据、原图坐标、版本和权限，才能兼顾召回、过滤、引用与复核。",
+        "score": 0.5422787472867248
+      },
+      {
+        "chunk_id": "1ee9f7c86553d4c870349c5b8b125fcbd227515419b70ec8cf461162de51b5a4",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型服务怎么压测？吞吐最高不等于能上线",
+          "详细回答",
+          "压测前，先固定什么？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4935,
+          4953,
+          4954
+        ],
+        "section_start_paragraph": 4955,
+        "section_end_paragraph": 4974,
+        "start_char": 350,
+        "end_char": 405,
+        "text": "用户实际会等多久。\n两层数据都要留。只测引擎，容易把网关和网络问题漏掉；只测端到端，又很难定位时间花在哪一层。",
+        "score": 0.5403352612116151
+      },
+      {
+        "chunk_id": "433167c15fb232b1a0dd55ca23c4fc63c49d9058f8250ad471fa250b14c1752c",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "什么时候微调、什么时候RAG？选型决策框架",
+          "五、真相：现实里常常是 RAG + 微调一起上"
+        ],
+        "heading_paragraphs": [
+          3540,
+          4126,
+          4238
+        ],
+        "section_start_paragraph": 4239,
+        "section_end_paragraph": 4252,
+        "start_char": 350,
+        "end_char": 429,
+        "text": "这部分靠 RAG，实时检索\n\t·但回答必须符合合规话术、专业风格、固定的风险提示格式 → 这部分靠 微调，焊进模型行为\n\t两条线各管各的，才是成熟系统的样子。",
+        "score": 0.5395739537665204
+      },
+      {
+        "chunk_id": "c25968cc3b48e05df61a7eff4c7873cc100a0f24a598bcd226c2104df541e346",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "显存还是不够，量化、卸载和分离式推理怎么选？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4706
+        ],
+        "section_start_paragraph": 4707,
+        "section_end_paragraph": 4737,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "这些方案解决的不是同一个问题。\n方案\n主要解决什么\n典型收益\n主要代价\nPagedAttention\n预留和碎片浪费\n提高KV池有效利用率和可服务并发\n块管理与内核路径更复杂\nPrefix Cache\n公共前缀重复计算和复制\n降低命中请求TTFT，复用KV块\n依赖重复前缀，占用缓存容量\nFP8 KV Cache\n每个Token的KV字节数过高\n相比BF16/FP16原始数据通常接近减半\n需要硬件和内核支持，必须做质量校准\nCPU、NVMe或远端卸载\nGPU工作集装不下\n用更大、更便宜的存储扩展容量\n数据传输增加延迟，受PCIe或网络带宽约束\nPrefill/Decode分离\n两阶段资源特征和延迟目标互相干扰\n分别调优TTFT与ITL，控制尾部ITL\n需要传输KV，架构和调度更复杂\nvLLM的量化KV文档支持FP8 KV Cache，并建议通过校准获得更可靠的缩放因子。精度从16位降到8位，",
+        "score": 0.5371805001620514
+      },
+      {
+        "chunk_id": "dcec6ff02970441d106808cc6c6f05622fa026ff3b2e760c4e27acd92ee58898",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "什么时候微调、什么时候RAG？选型决策框架",
+          "八、最后"
+        ],
+        "heading_paragraphs": [
+          3540,
+          4126,
+          4275
+        ],
+        "section_start_paragraph": 4276,
+        "section_end_paragraph": 4282,
+        "start_char": 0,
+        "end_char": 165,
+        "text": "\t选型这道题，难的从来不是知道 RAG 和微调各是什么。\n\t难的是遇到具体需求时，你能不能一眼看穿——它缺的到底是知识，还是行为。\n\t这一句想清楚了，剩下的都是顺水推舟：\n\t缺知识，RAG。\n\t缺行为，先 Prompt，不行再微调。\n\t两样都缺，一起上。\n\t别再一遇到问题就喊微调了。最贵的方案，应该是你最后的选择，不是第一反应。",
+        "score": 0.5368771818754284
+      },
+      {
+        "chunk_id": "9592002e2713978b504d707f16702dc34fcaa75e9c5a3daa3f149c9bc9e78e16",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Token、成本与延迟：大模型三个硬约束",
+          "面试",
+          "上下文越短越好吗？"
+        ],
+        "heading_paragraphs": [
+          266,
+          385,
+          393
+        ],
+        "section_start_paragraph": 394,
+        "section_end_paragraph": 394,
+        "start_char": 0,
+        "end_char": 63,
+        "text": "不是。删除噪声是优化，删除证据是降质。应该比较删除前后的任务成功率、引用正确率、成本和延迟，寻找满足质量门槛的最小有效上下文。",
+        "score": 0.5367254165625513
+      },
+      {
+        "chunk_id": "3d2e7b687ad2935ca542d36633c9c774b1995c1e47e5f254a2684cebfa45e7c4",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Token、成本与延迟：大模型三个硬约束",
+          "面试",
+          "如何回答“你们如何控制大模型成本”？"
+        ],
+        "heading_paragraphs": [
+          266,
+          385,
+          386
+        ],
+        "section_start_paragraph": 387,
+        "section_end_paragraph": 387,
+        "start_char": 0,
+        "end_char": 189,
+        "text": "控制成本不是简单的换便宜模型，而是关注“单位成功任务成本”。首先记录每次请求的输入、缓存输入、输出Token、工具调用次数、重试次数和模型类型；然后通过模型分层路由、上下文预算、限制输出长度、Prompt Cache、减少无效调用和控制Agent循环来降低成本。对于离线任务使用批处理或低优先级模式。同时用固定评测集约束准确率和工具调用成功率，确保成本下降不是以质量下降为代价。",
+        "score": 0.5365008970916201
+      },
+      {
+        "chunk_id": "db697587d7e59a2aa875b9a0922330200c99c51ff7b0c09127e23addcfb57c32",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Token、成本与延迟：大模型三个硬约束",
+          "延迟",
+          "批处理（Batching）"
+        ],
+        "heading_paragraphs": [
+          266,
+          293,
+          304
+        ],
+        "section_start_paragraph": 305,
+        "section_end_paragraph": 306,
+        "start_char": 0,
+        "end_char": 172,
+        "text": "大模型推理中的批处理，是把多个请求和多个序列合并成一个批次，让GPU并行计算，提高GPU利用率和系统总吞吐量。\n核心权衡为：批次越大->GPU通常更高效、总吞吐量更高。但可能等待更久、显存占用更高、单请求延迟变差。因此，批处理优化目标不是“Batch Size越大越好”，而是：在满足TTFT、TPOT和P99延迟要求的前提下，尽量提高吞吐量。",
+        "score": 0.5364495396027746
+      },
+      {
+        "chunk_id": "1ee6e490b03960b1960ab2900ceb19b587113c5957ec7e0ef3c033957d0e73a6",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "项目里应该按什么顺序优化？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4738
+        ],
+        "section_start_paragraph": 4739,
+        "section_end_paragraph": 4755,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "第一步不是立刻打开所有开关，而是把容量账算清楚。\n至少记录：\n·模型权重和非KV显存占用；\n·KV Cache总块数、使用率和可用块数；\n·活跃请求数、排队请求数和每条序列长度；\n·Prefix Cache命中Token数和命中率；\n·抢占、重算、Swap或Cache Miss次数；\n·TTFT、TPOT或ITL、P95/P99和SLO内Goodput。\n这些指标怎么设计压测负载，可以继续对照《大模型服务怎么压测？TTFT、TPOT、吞吐与Goodput》。\n然后按下面的顺序处理：\n1.先限制失控输入：校验最大上下文、最大输出和单租户并发，避免一个请求把整池KV吃掉；\n2.先减少管理浪费：启用成熟的分页KV管理和连续批处理，用真实长度分布压测调度参数；\n3.再提高复用：整理稳定前缀，观察命中Token而不是只看请求命中数，同时做好租户隔离；\n4.再缩小每Token占用：评估FP8 KV C",
+        "score": 0.536447426853529
+      },
+      {
+        "chunk_id": "053084f3b68fe10f648da5ed570114174353eefcf3a9585d8ff44d593eca065c",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "五、QLoRA：把“便宜”再往死里压一压"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4039
+        ],
+        "section_start_paragraph": 4040,
+        "section_end_paragraph": 4058,
+        "start_char": 0,
+        "end_char": 400,
+        "text": "\tLoRA 已经把可训练参数砍到很小了。\n\t但还有一座大山没搬走：\n\t那个被冻结的原始模型，本身还是要完整加载进显存的。\n\t7B 模型光权重就 14GB，70B 模型权重就 140GB。\n\t虽然它冻结了、不参与梯度更新，但你总得把它放进显存里做前向传播吧？\n\tQLoRA 解决的就是这个问题。\n\tQLoRA = Quantization + LoRA，量化 + 低秩适配。\n\t它的核心操作只有一句话：\n\t把那个冻结的基座模型，用 4bit 量化压缩后再加载，而 LoRA 旁路矩阵仍然用较高精度训练。\n\t这张图回答的是：QLoRA 到底量化了哪一部分。\n\t注意看，被压成 4bit 的是冻结的基座（反正它不更新，精度损失一点可以接受）。而真正在学习的 LoRA 适配器保持高精度，保证训练效果不掉。\n\t这一压，效果立竿见影：\n\t·原始权重从 16bit 压到 4bit，显存直接降到约四分之一\n\t·1",
+        "score": 0.5362443644113909
+      },
+      {
+        "chunk_id": "bc6566b4ce10456dff9ce8d615840f5956abede426edde6731dceab4254eceb5",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "KV Cache为什么会吃光显存？从PagedAttention到Prefix Cache",
+          "详细回答",
+          "显存还是不够，量化、卸载和分离式推理怎么选？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          4604,
+          4637,
+          4706
+        ],
+        "section_start_paragraph": 4707,
+        "section_end_paragraph": 4737,
+        "start_char": 350,
+        "end_char": 750,
+        "text": "量化KV文档支持FP8 KV Cache，并建议通过校准获得更可靠的缩放因子。精度从16位降到8位，KV主体数据的理论占用接近减半，但真实节省还要考虑Scale、对齐、临时缓冲和具体内核。\nTensorRT-LLM的KV Cache Connector 把CPU内存、NVMe和网络存储作为更低层级的缓存空间，也支持在不同实例间传输KV。容量变大了，但一次Cache Miss可能触发昂贵的数据搬运，所以卸载更适合有明显冷热分层、复用价值高或GPU容量特别紧张的负载。\nPrefill通常更偏计算密集，Decode更受显存带宽和逐Token调度影响。将两者拆到不同实例，可以分别扩容和调优。不过vLLM的分离式Prefill文档 (opens new window)明确提醒：它的主要目标是分别调优TTFT和ITL、控制尾部ITL，并不直接保证吞吐提升。\n这张图回答的是：看到KV池告警后应该先判断哪",
+        "score": 0.5344005050474777
+      },
+      {
+        "chunk_id": "178a85e06fc9e5f9c20d7272fc54b94beb51010c7665e8a8063979ed6b64aa77",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "微调认知",
+          "LoRA/QLoRA：为什么低秩微调这么流行",
+          "五、QLoRA：把“便宜”再往死里压一压",
+          "QLoRA 的几个关键技术点"
+        ],
+        "heading_paragraphs": [
+          3540,
+          3912,
+          4039,
+          4059
+        ],
+        "section_start_paragraph": 4060,
+        "section_end_paragraph": 4064,
+        "start_char": 0,
+        "end_char": 285,
+        "text": "\t面试如果深问 QLoRA，能甩出这几个词会很加分：\n\t·NF4（4-bit NormalFloat）：一种专门为正态分布权重设计的 4bit 量化数据类型，比普通的 int4 更贴合大模型权重的实际分布，精度损失更小\n\t·双重量化（Double Quantization）：连量化时产生的那些量化常数本身也再量化一次，进一步省一点显存\n\t·Paged Optimizer（分页优化器）：借助显存分页机制，应对训练中偶发的显存峰值，避免 OOM 直接崩掉\n\t但知道“QLoRA 不只是简单粗暴地砍精度，而是用 NF4 这种更聪明的量化方式尽量保住效果”，就够回答面试了。",
+        "score": 0.5343020338880231
+      },
+      {
+        "chunk_id": "1009b4f71ab03ca7d2ab2777491081139d7492b4f78bc23f0e9c2cb3770b68d7",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "大模型蒸馏",
+          "蒸馏和微调区别"
+        ],
+        "heading_paragraphs": [
+          1,
+          5
+        ],
+        "section_start_paragraph": 6,
+        "section_end_paragraph": 7,
+        "start_char": 0,
+        "end_char": 249,
+        "text": "微调是在预训练模型的基础上，用目标任务数据继续训练；蒸馏则利用教师模型的输出、概率分布、中间表征，将其能力迁移到学生模型。实际工程中常让强模型生成高质量领域数据，再SFT训练小模型，因此一次训练既是SFT，也可以是回答蒸馏。关键风险：教师模型生成的答案不必然正确，因此蒸馏数据必须经过筛选、去重和评测；否则学生模型会连同教师的幻觉一起学走。\n注：中间表征是模型隐藏层对输入形成的内部特征。它位于原始输入和最终输出之间，为后续层提供上下语义及结构信息。中间表征是数值向量，不等于自然语言形式的思维链。",
+        "score": 0.534051978882851
+      },
+      {
+        "chunk_id": "f3d45dfab882e60ac4aa43ebe091eb550f55990c2269eebf81b43ed0c8ee2000",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "Token、成本与延迟：大模型三个硬约束",
+          "面试",
+          "流式输出能降低延迟吗？"
+        ],
+        "heading_paragraphs": [
+          266,
+          385,
+          391
+        ],
+        "section_start_paragraph": 392,
+        "section_end_paragraph": 392,
+        "start_char": 0,
+        "end_char": 94,
+        "text": "它主要降低用户感知到的等待时间，让结果边生成边交付；通常不会减少模型的总计算量。要降低真实TTFT，需要减少排队和Prefill压力；要降低总耗时，还要控制输出长度并提高Decode速度。",
+        "score": 0.5339354818767554
+      },
+      {
+        "chunk_id": "d87dc296752510f9386bd330c8b06c9bcc5a67c1b899751216f9e137ec7a6eac",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "部署与工程化",
+          "大模型应用怎么稳定上线？网关、限流、监控、灰度与回滚",
+          "详细回答",
+          "为什么只按QPS限流不够？"
+        ],
+        "heading_paragraphs": [
+          4414,
+          5071,
+          5089,
+          5108
+        ],
+        "section_start_paragraph": 5109,
+        "section_end_paragraph": 5120,
+        "start_char": 350,
+        "end_char": 553,
+        "text": "oken做账单校正。\n超过容量时，系统只有三种诚实选择：拒绝、降级或排队。\n排队必须有长度和等待上限。队列持续增长时，新请求即使最终成功，也可能早已违反SLO。此时返回明确的过载错误，通常比让用户等到超时更可控。\n这就是背压：下游处理不过来时，压力要向上游传回去，而不是把请求藏在越来越长的队列里。\n入口先按Token估算工作量，队列满了就拒绝，已经超时的任务及时取消，后面的模型服务才不会被无效请求拖垮。",
+        "score": 0.5327530528867603
+      },
+      {
+        "chunk_id": "dc72f8d2a26d589945f30e67bf2d1766f87f65fef53f44b03d3bed11d53d8bf8",
+        "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+        "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+        "heading_path": [
+          "多模态入门",
+          "多模态落地：Token成本暴增怎么办？"
+        ],
+        "heading_paragraphs": [
+          5208,
+          5397
+        ],
+        "section_start_paragraph": 5398,
+        "section_end_paragraph": 5400,
+        "start_char": 0,
+        "end_char": 141,
+        "text": "Demo里传一张图挺便宜，接上真实用户后，账单和延迟怎么一起涨了？\n常见回答是：“把图片压缩一下，换个便宜模型就行。”方向没错，但压缩文件不一定减少视觉Token；换模型也可能让答案变差、重试变多。\n多模态降本的关键，是减少模型实际处理的视觉信息和重复调用，同时保住任务需要的证据。",
+        "score": 0.5325458808151139
+      }
+    ]
+  },
+  "hybrid": [
+    {
+      "chunk_id": "c89fd27c1d641898b0d8699e593db90ff550ad1edc0047ba00ae1e7938f2a75c",
+      "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+      "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+      "heading_path": [
+        "部署与工程化",
+        "云API、托管推理还是自部署？大模型部署方案怎么选",
+        "简要回答",
+        "知识拓展",
+        "Q5：应用开发者需要学到多深？"
+      ],
+      "heading_paragraphs": [
+        4414,
+        4415,
+        4425,
+        4538,
+        4547
+      ],
+      "section_start_paragraph": 4548,
+      "section_end_paragraph": 4601,
+      "start_char": 700,
+      "end_char": 1061,
+      "text": "约定 SLO 的请求数量\n错误率、业务成功率\n服务是否可靠，结果是否真正有用\n④根据现象选择排查层，而不是直接换模型。\n现象\n优先检查\n很久不出第一个字，之后输出正常\n应用前置步骤、排队时间、输入长度和 Prefill\n很快开始，但后面生成很慢\nDecode、资源竞争、活跃并发和内存带宽\n单请求正常，并发一高就超时\n队列、限流、推理容量及超时配置\n加长上下文后 OOM（Out of Memory，内存不足）\nKV Cache、临时计算空间和可用显存\n模型调用很快，整个 Agent 很慢\n工具耗时、串行步骤、重复调用和重试\n返回速度正常，但答案变差\n模型版本、模板、上下文、截断及采样配置\n这些是排查入口，不是仅凭现象就能确定的结论。应通过请求追踪，把应用、检索、工具、排队和模型生成的耗时拆开，再用压测验证修改效果。",
+      "score": 0.03009207275993712,
+      "ranks": {
+        "bm25": 1,
+        "vector": 13
+      },
+      "retrieval_scores": {
+        "bm25": 28.026800289066184,
+        "vector": 0.5634923811830793
+      }
+    },
+    {
+      "chunk_id": "82285d4ea3fae7ed69e20ff64fb4eec4ff3d200d832e7b9cd0d213970c6cb946",
+      "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+      "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+      "heading_path": [
+        "部署与工程化",
+        "云API、托管推理还是自部署？大模型部署方案怎么选",
+        "简要回答",
+        "知识拓展",
+        "Q5：应用开发者需要学到多深？"
+      ],
+      "heading_paragraphs": [
+        4414,
+        4415,
+        4425,
+        4538,
+        4547
+      ],
+      "section_start_paragraph": 4548,
+      "section_end_paragraph": 4601,
+      "start_char": 0,
+      "end_char": 400,
+      "text": "不要求每个人都写CUDA内核，但要能讲清责任边界、容量和SLO，知道模型为什么放不下、并发为什么上不去、故障时该看哪一层。否则你只能把所有问题都归因成“模型太慢”。\n① 讲清责任边界：一次请求经过哪些层。\n用户请求\n   ↓\n应用层：Prompt、RAG、Agent 编排、工具调用\n   ↓\n网关层：认证、限流、路由、超时\n   ↓\n推理服务：排队、批处理、KV Cache 管理\n   ↓\n模型计算：Prefill、Decode\n   ↓\n硬件资源：GPU、显存、网络、存储\nAgent 串行调用了五次模型，响应慢可能来自应用编排；请求排队很久，可能是服务容量不足。两者都不能简单归因于模型计算慢。\n② 理解容量：为什么模型放不下，并发上不去。\n推理显存可以粗略拆成：\n所以：\n权重能装下，不代表请求能跑起来：还需要给计算和 KV Cache 留空间。\n单请求能跑，不代表高并发能跑：更多活跃序列",
+      "score": 0.03007688828584351,
+      "ranks": {
+        "bm25": 6,
+        "vector": 7
+      },
+      "retrieval_scores": {
+        "bm25": 25.52226538338644,
+        "vector": 0.5695162489682645
+      }
+    },
+    {
+      "chunk_id": "01ef9d2ce377d97d530705b95759bb5912b8deb8aa5e1cec13a906f064c6e6b6",
+      "source": "D:\\HuaweiMoveData\\Users\\龙家威\\Desktop\\笔记\\面试准备.docx",
+      "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+      "heading_path": [
+        "微调认知",
+        "LoRA/QLoRA：为什么低秩微调这么流行",
+        "先搞清楚：全参微调到底贵在哪"
+      ],
+      "heading_paragraphs": [
+        3540,
+        3912,
+        3928
+      ],
+      "section_start_paragraph": 3929,
+      "section_end_paragraph": 3943,
+      "start_char": 0,
+      "end_char": 400,
+      "text": "要理解 LoRA 为什么省，得先知道全参微调为什么贵。\n很多人以为微调贵是因为“模型参数多”。\n这只说对了一半。真正吃显存的，不只是模型权重本身。\n我们以一个 7B 模型为例，用最常见的 Adam 优化器，按 FP16 精度算一笔账：\n·模型权重：7B 参数，约 14GB\n·梯度：每个参数都要存一份梯度，又是约 14GB\n·优化器状态：Adam 要为每个参数存动量和方差两份，约 28GB（甚至更多，常用 FP32 存）\n光这三块加起来就奔着 70GB 去了。还没算前向传播的激活值。\n这张图回答的是：全参微调的显存大头不是模型权重，而是梯度和优化器状态。\n你看，权重只占一份，但梯度是一份，Adam 优化器状态是两份。 真正训练时，可训练参数的“伴生开销”比权重本身还大。\n所以核心矛盾很清楚：\n只要你要更新全部参数，梯度和优化器状态就甩不掉，显存就降不下来。\n那有没有办法，只更新一小部分参数，",
+      "score": 0.02946236559139785,
+      "ranks": {
+        "bm25": 15,
+        "vector": 2
+      },
+      "retrieval_scores": {
+        "bm25": 22.070711592803136,
+        "vector": 0.5888360736042381
+      }
+    }
+  ]
+}
