@@ -1,0 +1,7 @@
+# 已验收环境：Windows，Python 3.12.14。
+-r requirements.txt  # 继承基础 Agent 和 HTTP 服务依赖。
+torch==2.15.0+cpu  # 固定当前使用的 CPU 推理后端。
+sentence-transformers==6.2.0  # 提供 SentenceTransformer 和 CrossEncoder。
+transformers==5.21.0  # 提供模型及分词器加载能力。
+huggingface-hub==2.3.0  # 固定模型下载与本地缓存相关依赖。
+numpy==2.5.4  # 固定向量数组处理相关依赖。

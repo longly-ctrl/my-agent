@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "source_report": "docx_generation_20261101T055838_823203Z.json",
+  "source_report_sha256": "69ee32924eb52fec9f4d9fa005b35cf290f7c9213257cbfa09e65fc9dcc6b00c",
+  "reviewer": "assistant",
+  "review_date": "2026-11-01",
+  "scope": "regression",
+  "results": [
+    {
+      "id": "docx_nf4",
+      "review_status": "passed",
+      "review_notes": "定义、基座量化和适配器精度均有对应原文，两条引用来自本题工具结果。"
+    },
+    {
+      "id": "docx_rrf_grounding",
+      "review_status": "passed",
+      "review_notes": "解释限于资料提供的排序直觉；Rerank 扩展有对应来源，未补写 RRF 公式或参数。"
+    },
+    {
+      "id": "docx_rrf_scope_missing",
+      "review_status": "passed",
+      "review_notes": "只判断指定段落，未补写公式或常数，未混用其他概念，也未声称整篇文档没有相关内容。"
+    }
+  ],
+  "summary": {
+    "reviewed": 3,
+    "passed": 3,
+    "failed": 0
+  }
+}

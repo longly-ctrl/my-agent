@@ -9,6 +9,7 @@ from session_store import (
     load_session,
 )
 import argparse
+from pathlib import Path  # 处理命令行传入的文档路径及项目缓存路径。
 
 #                       未将工具说明拆成独立模块                                        0.3
 # # 每一轮都向模型提供相同的工具说明。
@@ -61,7 +62,7 @@ import argparse
 # })
 #                                                                                             0.3
 
-def main(session_id: str | None = None):
+def main(session_id: str | None = None, *, docx_path: Path | None = None):  # 可选地启用外部 Word 检索。
     # 不传ID时兼容原存档；指定ID时使用独立存档。
     session_file = (
         SESSION_PATH if session_id is None
@@ -72,7 +73,7 @@ def main(session_id: str | None = None):
     config = load_config()
     # 整个会话共用这一个列表，不能放进下面的 while 循环。
     # 同一个会话复用这份历史；新会话重新调用函数创建。
-    messages = build_initial_messages()
+    messages = build_initial_messages(external_enabled=docx_path is not None)  # 按本次启动参数选择系统规则。
     try:
         history = load_session(path=session_file)
     except (OSError, ValueError) as exc:
@@ -83,6 +84,17 @@ def main(session_id: str | None = None):
         # 跳过旧 system，使用当前代码里的系统规则。
         messages.extend(history[1:])
         print(f"已恢复 {len(history) - 1} 条历史消息。")
+
+    external_search = None  # 默认不提供外部检索工具。
+    if docx_path is not None:  # 只有明确指定文档时才初始化检索资源。
+        from retrieval_service import RetrievalService  # 按需导入本地检索服务。
+        from external_knowledge_tool import ExternalKnowledgeTool  # 按需导入工具适配层。
+
+        root = Path(__file__).resolve().parent  # 定位项目目录，不依赖终端当前目录。
+        retrieval = RetrievalService(root / ".cache" / "knowledge_vectors.json", docx_path)  # 校验缓存并加载一次模型，默认关闭精排。
+        external_tool = ExternalKnowledgeTool(retrieval)  # 让工具持有同一个检索服务。
+        external_search = external_tool.search  # 保存绑定方法，供每轮 Agent 调用复用。
+        print("外部 Word 混合检索已启用，精排关闭。")  # 显示当前资料模式。
     # 创建客户端；退出 with 时自动关闭网络连接资源。
     # 整个会话复用客户端，退出会话后再关闭。
     with OpenAI(
@@ -112,11 +124,12 @@ def main(session_id: str | None = None):
             })
 
             try:
-                answer = run_agent(
-                    client,
-                    config["LLM_MODEL_ID"],
-                    messages,
-                    max_steps=5,
+                answer = run_agent(  # 执行当前问题，复用已经初始化的工具。
+                    client,  # 复用当前 CLI 客户端。
+                    config["LLM_MODEL_ID"],  # 使用本地配置中的模型。
+                    messages,  # 保留当前会话历史。
+                    max_steps=5,  # 沿用模型调用预算。
+                    external_search=external_search,  # 传入绑定方法；未启用时传入 None。
                 )
             except (APIError, OSError, ValueError, TypeError, RuntimeError) as exc:
                 # 删除当前问题及其执行过程中追加的所有消息。
@@ -272,5 +285,11 @@ if __name__ == "__main__":
         default=None,
         help="会话ID；省略时使用原来的session.json",
     )
-    args = parser.parse_args()
-    main(session_id=args.session)
+    parser.add_argument(  # 增加外部资料启动选项。
+        "--docx",  # 接收原始 Word 文件路径。
+        type=Path,  # 将命令行字符串转换为 Path。
+        default=None,  # 不传时继续使用原来的 Markdown 模式。
+        help="启用外部 Word 混合检索，使用已有向量缓存",  # 说明需要事先生成缓存。
+    )
+    args = parser.parse_args()  # 解析会话与资料选项。
+    main(session_id=args.session, docx_path=args.docx)  # 将启动配置传入入口。

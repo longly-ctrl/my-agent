@@ -106,3 +106,26 @@ TOOL_SCHEMAS.extend([
         },
     },
 ])
+
+EXTERNAL_KNOWLEDGE_SCHEMA = {  # 仅在调用方提供外部检索能力时使用。
+    "type": "function",  # 声明这是函数工具。
+    "function": {  # 定义模型可见的调用接口。
+        "name": "search_external_knowledge",  # 与本地注册表中的名称保持一致。
+        "description": (  # 说明资料范围、返回内容和引用方式。
+            "混合检索外部 Word 学习资料，返回前三个候选的完整文本块。"
+            "文本块不代表整个章节；回答来源应原样复制返回的 citation。"
+        ),
+        "parameters": {  # 描述允许模型提交的参数。
+            "type": "object",  # 参数必须是 JSON 对象。
+            "properties": {  # 声明允许的字段。
+                "query": {  # 接收检索问题。
+                    "type": "string",  # 要求字符串。
+                    "minLength": 1,  # 声明非空要求；纯空白仍由本地检查。
+                    "description": "自然语言问题或明确的技术术语，例如 QLoRA 中的 NF4 是什么。",  # 支持语义检索表达。
+                },
+            },
+            "required": ["query"],  # 必须提供查询。
+            "additionalProperties": False,  # 不允许传入模型路径等额外配置。
+        },
+    },
+}

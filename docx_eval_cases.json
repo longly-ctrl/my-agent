@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "split": "regression",
+  "source_hash": "847add2d70a96c763d8447745f97675a620906097e1a5a6f39030c6f3dc8fa9c",
+  "expected_sources_policy": "required_subset",
+  "cases": [
+    {
+      "id": "docx_nf4",
+      "question": "仅依据外部 Word 资料，用两句话解释 QLoRA 中的 NF4，并引用来源。",
+      "expected_sources": [
+        "[docx:178a85e06fc9e5f9c20d7272fc54b94beb51010c7665e8a8063979ed6b64aa77]"
+      ],
+      "answer_checks": [
+        "说明 NF4 是专门为正态分布权重设计的 4bit 量化数据类型",
+        "回答中的事实由工具正文支持，引用与事实对应"
+      ]
+    },
+    {
+      "id": "docx_rrf_grounding",
+      "question": "仅依据外部 Word 资料，简要解释 RRF 如何合并两路检索结果，并引用来源。",
+      "expected_sources": [
+        "[docx:1d1de1c3d7835bd82738d298ce40842c3214272ba7b06c5cb9afe87ea6fdd85f]"
+      ],
+      "answer_checks": [
+        "说明向量检索与 BM25 两路结果通过融合算法合并排序",
+        "依据原文解释两路排名与融合分数的直觉关系",
+        "不凭模型知识补出原文未提供的计算步骤、公式或参数",
+        "扩展介绍 Rerank 时必须有对应原文和引用"
+      ]
+    },
+    {
+      "id": "docx_rrf_scope_missing",
+      "question": "仅依据外部 Word 资料中含“RRF的思路很直觉”的段落，说明该段是否提供了具体打分公式和常数取值；未提供的内容请明确说明，不要补充。",
+      "expected_sources": [
+        "[docx:1d1de1c3d7835bd82738d298ce40842c3214272ba7b06c5cb9afe87ea6fdd85f]"
+      ],
+      "answer_checks": [
+        "明确该段提供的是排序直觉，没有给出具体打分公式和常数取值",
+        "不凭模型知识补写公式或默认数值",
+        "不把 MRR 公式或检索候选数量当作 RRF 的公式或常数",
+        "只判断指定段落，不声称整篇文档都没有相关内容"
+      ]
+    }
+  ]
+}

@@ -1,18 +1,25 @@
 from time import perf_counter
 
 from openai import OpenAI, APIError
-from agent import build_initial_messages, run_agent
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 from app_config import load_config
+from collections.abc import Callable  # 描述调用方提供的检索函数。
+from agent import build_initial_messages, run_agent, MAX_OUTPUT_TOKENS  # 复用 Agent 及实际输出上限。
 
 
-def run_case(client: OpenAI, model: str, case: dict) -> dict:
+def run_case(  # 独立执行一条评估用例。
+    client: OpenAI,  # 接收整批评估共用的客户端。
+    model: str,  # 使用指定的云端模型。
+    case: dict,  # 接收问题、预期来源和检查标准。
+    *,  # 新参数必须通过名称传入。
+    external_search: Callable[[str], str] | None = None,  # 可选地注入外部检索工具。
+) -> dict:
     """独立执行一个用例，保留结果供后续评审。"""
     # 每个用例从空会话开始，不加载个人存档。
-    messages = build_initial_messages()
+    messages = build_initial_messages(external_enabled=external_search is not None)  # 每题使用独立历史，并选择对应资料模式。
     messages.append({
         "role": "user",
         "content": case["question"],
@@ -22,15 +29,17 @@ def run_case(client: OpenAI, model: str, case: dict) -> dict:
     error = None
     # 每个用例独立持有自己的用量记录。
     usage_records = []
-    started = perf_counter()
+    max_steps = 5  # 统一保存本题的模型调用预算。
+    started = perf_counter()  # 从 Agent 执行前开始计时，不包含模型初始化。
 
     try:
-        answer = run_agent(
-            client,
-            model,
-            messages,
-            max_steps=5,
-            usage_records=usage_records,
+        answer = run_agent(  # 执行当前评估问题。
+            client,  # 复用调用方提供的客户端。
+            model,  # 使用当前评估模型。
+            messages,  # 只传入本题的独立历史。
+            max_steps=max_steps,  # 使用与报告一致的调用预算。
+            usage_records=usage_records,  # 保留每次请求的实际用量。
+            external_search=external_search,  # 转发共享检索工具。
         )
     except (APIError, OSError, ValueError, TypeError, RuntimeError) as exc:
         # 记录执行失败，保留已有轨迹，方便定位失败发生在哪一步。
@@ -43,6 +52,11 @@ def run_case(client: OpenAI, model: str, case: dict) -> dict:
 
     return {
         "id": case["id"],
+        "external_enabled": external_search is not None,  # 记录本题是否启用了外部资料。
+        "generation_config": {  # 保存解释结果所需的生成配置。
+            "max_steps": max_steps,  # 记录最大模型调用次数。
+            "max_output_tokens": MAX_OUTPUT_TOKENS,  # 记录每次调用的输出上限。
+        },
         # 完成执行不等于答案正确，质量需要另外评审。
         "execution_status": "completed" if error is None else "error",
         "review_status": "pending",
